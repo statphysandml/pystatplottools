@@ -9,17 +9,64 @@ class DistributionDD(DistributionBaseClass):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-        self.expectation_values = None
+    def binned_statistics_over_axes(self, axes_indices,
+                                    columns=None,
+                                    statistic='count',
+                                    transform='lin',
+                                    nbins=[], # Refers to the number of bins in each dimension
+                                    range_min=None,  # Refers to the ranges of the bins in the different dimension of axes_indices
+                                    range_max=None,  # Refers to the ranges of the bins in the different dimension of axes_indices
+                                    bin_scales='Linear',
+                                    with_binnumber=False
+                                    ):
+        return self.compute_binned_statistics(axes_indices=axes_indices,
+                                              columns=columns,
+                                              statistic=statistic,
+                                              transform=transform,
+                                              nbins=nbins,
+                                              range_min=range_min,
+                                              range_max=range_max,
+                                              bin_scales=bin_scales,
+                                              with_binnumber=with_binnumber
+                                              )
 
-    def compute_binned_statistics(self, axes_indices,
-                                  columns=None,
-                                  range_min=None,
-                                  range_max=None,
-                                  nbins=[],
-                                  bin_scales='Linear',
-                                  transform="lin",
-                                  with_binnumber=False,
-                                  statistic='probability'):
+    def compute_1Dhistograms(self,
+                           columns,
+                           statistic='count',
+                           transform='lin',
+                           nbins=[], # Refers to the number of bins for each column
+                           range_min=None, # Refers to the ranges of the bins for each column
+                           range_max=None, # Refers to the ranges of the bins for each column
+                           bin_scales='Linear',
+                           with_binnumber=False
+                           ):
+        return self.compute_binned_statistics(columns=columns,
+                                       statistic=statistic,
+                                       transform=transform,
+                                       nbins=nbins,
+                                       range_min=range_min,
+                                       range_max=range_max,
+                                       bin_scales=bin_scales,
+                                       with_binnumber=with_binnumber
+                                       )
+
+    def compute_binned_statistics(self, axes_indices=None,
+                                    columns=None,
+                                    statistic='count',
+                                    transform='lin',
+                                    nbins=[],
+                                    range_min=None,
+                                    range_max=None,
+                                    bin_scales='Linear',
+                                    with_binnumber=False):
+
+        if axes_indices is None:
+            # Compute 1D statistics separate for each column
+            axes_indices = columns # To generate the correct bins
+            seperate_statistics = True
+        else:
+            seperate_statistics = False
+
         if columns is None:
             columns = [axes_indices[0]]
 
@@ -49,21 +96,49 @@ class DistributionDD(DistributionBaseClass):
 
         bin_statistic = statistic
 
+        sample_indices = axes_indices # Default assumes computation with axes indices
         binned_statistics = dict()
         for row in row_values:
             binned_statistics[row] = dict()
             for col in columns:
                 if statistic is "probability":
                     bin_statistic = lambda x: len(x) * 1.0 / len(self.data.loc[row])
+                if seperate_statistics:  # For 1D histrograms
+                    sample_indices = col
                 hist, rel_bins, binnumber = binned_statistic_dd(
-                    sample=self.data.loc[row][axes_indices].values, values=self.data.loc[row][col], statistic=bin_statistic,
-                    bins=[histogram_prep[ax_idx][row]['bin_edges'] for ax_idx in axes_indices])
+                    sample=self.data.loc[row][sample_indices].values, values=self.data.loc[row][col], statistic=bin_statistic,
+                    bins=[histogram_prep[ax_idx][row]['bin_edges'] for ax_idx in sample_indices])
                 if with_binnumber:
-                    binned_statistics[row][col] = {'hist': hist, 'rel_bins': rel_bins, 'rel_bins_index': axes_indices, 'binnumber': binnumber}
+                    binned_statistics[row][col] = {'hist': hist, 'rel_bins': rel_bins, 'rel_bins_index': sample_indices, 'binnumber': binnumber}
                 else:
-                    binned_statistics[row][col] = {'hist': hist, 'rel_bins': rel_bins, 'rel_bins_index': axes_indices}
+                    binned_statistics[row][col] = {'hist': hist, 'rel_bins': rel_bins, 'rel_bins_index': sample_indices}
 
         return binned_statistics
+
+    @staticmethod
+    def linearize_histograms(histogram_data, order_by_bin=False):
+        keys = list(histogram_data.keys())
+        columns = list(histogram_data[keys[0]].keys())
+
+        linearized_data = []
+
+        if order_by_bin:
+            for col in columns:
+                bins = histogram_data[keys[0]][col]['rel_bins'][0]
+                results = {"bin": (bins[:-1] + bins[1:]) / 2}
+                for key in keys:
+                    results[key] = histogram_data[key][col]['hist'].reshape(-1)
+                linearized_data.append(pd.DataFrame(results))
+            return pd.concat(linearized_data, keys=columns)
+        else:
+            for key in keys:
+                results = [] # {"column": [], "index": [], "bin": [], "data": []}  # ax_idx: resulting_bin for ax_idx, resulting_bin in zip(axes_indices, resulting_bins)}
+                for idx, col in enumerate(columns):
+                    bins = histogram_data[key][col]['rel_bins'][0]
+                    bins = (bins[:-1] + bins[1:]) / 2
+                    results.append(pd.DataFrame({"bin": bins, "data": histogram_data[key][col]['hist'].reshape(-1)}))
+                linearized_data.append(pd.concat(results, keys=columns))
+            return pd.concat(linearized_data, keys=keys)
 
     @staticmethod
     def linearize_binned_statistics(axes_indices, binned_statistics, output_column_names=None):
@@ -78,9 +153,15 @@ class DistributionDD(DistributionBaseClass):
                 "Number of columns and number of output_column_names do not coincide"
 
         bins = binned_statistics[keys[0]][columns[0]]['rel_bins']
+        # Check whether all rows and columns have the same rel_bin
+        for key in keys:
+            for col in columns:
+                binn = binned_statistics[key][col]['rel_bins']
+                assert False not in [np.array_equal(bis, bi) for bis, bi in zip(bins, binn)], \
+                    "Rows and columns do not share the same bins - Linearisation is not possible"
+
         bin_indices = np.array(binned_statistics[keys[0]][columns[0]]["rel_bins_index"])
         bins = {bin_idx: bin_content for bin_idx, bin_content in zip(bin_indices, bins)}
-
         bin_sizes = np.array([len(bins[ax_idx])-1 for ax_idx in axes_indices])
 
         resulting_bins = []

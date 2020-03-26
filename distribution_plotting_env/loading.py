@@ -3,6 +3,8 @@ import numpy as np
 import json
 
 
+## ToDo: Currently not part of any code!!
+
 def load_data(mode, filename, directory, root_dir, rel_path="./"):
     df = pd.read_csv(rel_path + root_dir + "/" + directory + "/" + mode + "_" + filename + ".dat", header=0, delimiter="\t",
                      index_col=False)

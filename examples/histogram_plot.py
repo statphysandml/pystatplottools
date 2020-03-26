@@ -13,19 +13,11 @@ def probability_historam_plot():
 
     from distribution_plotting_env.histogram import Histogram
 
-    histogram = Histogram(data=linearized_statistics.loc["df1"])
-
-    from distribution_plotting_env.contour2D import Contour2D
-    contour2D = Contour2D(
-        data=linearized_statistics.loc["df2"],
-        compute_x_func=lambda x: x["a"],  # possibility to rescale x and y axis or perform other operation for x axis
-        # like computing a mass difference
-        compute_y_func=lambda x: x["b"],
-        z_index=z_index
-    )
+    histogram = Histogram(data=linearized_statistics.loc["a"][["bin", "df1"]])
 
     fig, ax = fma.newfig(1.4)
     histogram.set_ax_labels(ax, x_label="xLabel", y_label="Probability")
+    histogram.plot(ax)
     # hist = histogram.histogram(ax, hist, rel_bins, color="darkblue", label=None)
 
     plt.tight_layout()

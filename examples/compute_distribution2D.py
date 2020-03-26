@@ -10,7 +10,7 @@ def compute_probability_distribution2D(z_index_name="probability"):
 
     # Generate for each given column a two d distribution based on x_index and y_index as columns
     # This is done separately for each initial dataset
-    binned_statistics = dist2d.compute_binned_statistics(
+    binned_statistics = dist2d.binned_statistics_over_axes(
         axes_indices=["a", "b"],
         range_min=[-5.0, -4.0],
         range_max=[5.0, 4.0],
@@ -31,7 +31,7 @@ def compute_statistics_of_column_distribution2D():
 
     # Generate for each given column a two d distribution based on x_index and y_index as columns
     # This is done separately for each initial dataset
-    binned_statistics = dist2d.compute_binned_statistics(
+    binned_statistics = dist2d.binned_statistics_over_axes(
         axes_indices=["a", "b"],
         columns=["c", "idx"],
         range_min=[-5.0, -4.0],

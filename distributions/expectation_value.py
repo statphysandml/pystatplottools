@@ -28,20 +28,17 @@ def compute_binder_cumulant(dist):
     dist.expectation_values["BinderCumulant", "mean"] = 1 - dist.expectation_values['Mean', 'fourthmoment']/(3*pow(dist.expectation_values['Mean', 'secondmoment'], 2))
 
 
-class Distribution1D(DistributionBaseClass):
-
+class ExpectationValue(DistributionBaseClass):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-
-        self.histograms = None
         self.expectation_values = None
 
-    def compute_expectation_values(self,
-                                   columns=['spectral_function_loss', 'clean_vs_noisy_propagator_loss',
-                                            'clean_vs_recon_propagator_loss', 'noisy_vs_recon_propagator_loss',
-                                            'parameter_norm'],
-                                   exp_values=['mean', 'max', 'min', 'median', 'quant25', 'quant75', 'std'],
-                                   transform="lin"):
+    def compute_expectation_value(self,
+                                  columns=['spectral_function_loss', 'clean_vs_noisy_propagator_loss',
+                                           'clean_vs_recon_propagator_loss', 'noisy_vs_recon_propagator_loss',
+                                           'parameter_norm'],
+                                  exp_values=['mean', 'max', 'min', 'median', 'quant25', 'quant75', 'std'],
+                                  transform="lin"):
 
         # Replace quantiles by corresponding functions
         quant25list = np.argwhere(np.array(exp_values) == 'quant25').flatten()
@@ -65,7 +62,6 @@ class Distribution1D(DistributionBaseClass):
             columns = self.transform_log10(columns=columns)
             # Adapt columns to apply measures on
 
-
         # Compute or extend expectation values
         if self.expectation_values is None:
             self.expectation_values = self.data.groupby(level=0)[columns].agg(exp_values)
@@ -73,17 +69,6 @@ class Distribution1D(DistributionBaseClass):
             new_expectation_values = self.data.groupby(level=0)[columns].agg(exp_values)
             # Extract duplicate columns
             cols_to_use = self.expectation_values.columns.difference(new_expectation_values.columns)
-            self.expectation_values = pd.concat([self.expectation_values[cols_to_use], new_expectation_values], axis=1,
+            self.expectation_values = pd.concat([self.expectation_values[cols_to_use], new_expectation_values],
+                                                axis=1,
                                                 verify_integrity=True).sort_index(axis=1)
-
-if __name__ == "__main__":
-    pass
-    # from loading import Loading
-    # loading = Loading("EvaluationDynamic", "TestDataSet2BWCascade")
-    #
-    # dist1d = Distribution1D(data=loading.get_data())
-    # dist1d.compute_expectation_values(columns=['spectral_function_loss', 'clean_vs_noisy_propagator_loss'],
-    #                                   exp_values=['mean', 'max', 'min'], transform='log10')
-    # dist1d.compute_expectation_values(columns=['clean_vs_noisy_propagator_loss', 'clean_vs_recon_propagator_loss',
-    #                                            'noisy_vs_recon_propagator_loss', 'parameter_norm'],
-    #                                   exp_values=['mean', 'median', 'quant25', 'quant75', 'std'])

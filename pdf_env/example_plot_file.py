@@ -1,6 +1,6 @@
 import numpy as np
-# import pdf_plotting_env.figure_management as fma
-import pdf_plotting_env.figure_devolpment as fma
+# import pdf_env.figure_management as fma
+import pdf_env.figure_devolpment as fma
 import matplotlib.pyplot as plt
 
 def simple_plot():

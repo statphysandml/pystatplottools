@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 
-from distribution_plotting_env.diagram_base_class import DiagramBaseClass
+from plotting_env.diagram_base_class import DiagramBaseClass
 
 # def mass_difference(data):
 #     return data.mass2 - data.mass1

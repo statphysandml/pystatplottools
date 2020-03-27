@@ -1,17 +1,17 @@
-from pdf_env.loading_figure_mode import loading_figure_mode
+from ppd_pdf_env.loading_figure_mode import loading_figure_mode
 fma, plt = loading_figure_mode(develop=True)
 
 
 def probability_historam_plot():
     z_index = "probability"
 
-    from examples.compute_distributionDD import compute_probability_distribution1D
+    from ppd_examples.compute_distributionDD import compute_probability_distribution1D
     linearized_statistics = compute_probability_distribution1D(z_index_name=z_index)
 
     dataframe_indices = linearized_statistics.index.unique(0)
     print("Considered dataframes", dataframe_indices.values)
 
-    from plotting_env.histogram import Histogram
+    from ppd_plotting_env.histogram import Histogram
 
     histogram = Histogram(data=linearized_statistics.loc["a"][["bin", "df1"]])
 

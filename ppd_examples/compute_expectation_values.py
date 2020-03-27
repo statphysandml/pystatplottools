@@ -1,8 +1,8 @@
-from examples.mock_data import load_multivariate_mock_data
+from ppd_examples.mock_data import load_multivariate_mock_data
 data = load_multivariate_mock_data()
 
 
-from distributions.expectation_value import ExpectationValue
+from ppd_distributions.expectation_value import ExpectationValue
 
 
 def compute_expectation_values_distribution1D():

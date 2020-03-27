@@ -1,4 +1,4 @@
-from plotting_env.diagram_base_class import DiagramBaseClass
+from ppd_plotting_env.diagram_base_class import DiagramBaseClass
 import numpy as np
 
 

@@ -1,14 +1,14 @@
-from examples.compute_distribution2D import compute_probability_distribution2D, compute_statistics_of_column_distribution2D
-from examples.compute_distributionDD import compute_statistics_of_column_distribution1D, \
+from ppd_examples.compute_distribution2D import compute_probability_distribution2D, compute_statistics_of_column_distribution2D
+from ppd_examples.compute_distributionDD import compute_statistics_of_column_distribution1D, \
     compute_statistics_of_column_distributionDD, \
     compute_probability_distribution1D, \
     compute_probability_distribution1D_alternative, \
     compute_probability_distributionDD
-from examples.histogram_plot import probability_historam_plot
-from examples.contour_plots import probability_contour_plot, plot_statistics_of_columns
-from examples.surface_plots import probability_surface_plot
+from ppd_examples.histogram_plot import probability_historam_plot
+from ppd_examples.contour_plots import probability_contour_plot, plot_statistics_of_columns
+from ppd_examples.surface_plots import probability_surface_plot
 
-from examples.compute_expectation_values import compute_expectation_values_distribution1D
+from ppd_examples.compute_expectation_values import compute_expectation_values_distribution1D
 
 
 if __name__ == '__main__':

@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 
-from distributions.distributionbaseclass import DistributionBaseClass
+from ppd_distributions.distributionbaseclass import DistributionBaseClass
 
 
 class DistributionDD(DistributionBaseClass):

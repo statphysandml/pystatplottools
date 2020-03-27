@@ -1,17 +1,17 @@
-from pdf_env.loading_figure_mode import loading_figure_mode
+from ppd_pdf_env.loading_figure_mode import loading_figure_mode
 fma, plt = loading_figure_mode(develop=True)
 
 
 def probability_surface_plot():
     z_index = "probability"
 
-    from examples.compute_distribution2D import compute_probability_distribution2D
+    from ppd_examples.compute_distribution2D import compute_probability_distribution2D
     linearized_statistics = compute_probability_distribution2D(z_index_name=z_index)
 
     dataframe_indices = linearized_statistics.index.unique(0)
     print("Considered dataframes", dataframe_indices.values)
 
-    from plotting_env.contour2D import Contour2D
+    from ppd_plotting_env.contour2D import Contour2D
     contour2D = Contour2D(
         data=linearized_statistics.loc["df1"],
         compute_x_func=lambda x: x["a"],

@@ -1,8 +1,8 @@
-from examples.mock_data import load_multivariate_mock_data
+from ppd_examples.mock_data import load_multivariate_mock_data
 data = load_multivariate_mock_data()
 
 
-from distributions.distributionDD import DistributionDD
+from ppd_distributions.distributionDD import DistributionDD
 
 
 def compute_probability_distribution2D(z_index_name="probability"):

@@ -7,15 +7,16 @@ class DistributionBaseClass:
     __metaclass__ = ABCMeta
 
     def __init__(self, **kwargs):
-        self.data = kwargs.pop("data")
+        self.data = kwargs.pop("data", None)
         self.name = kwargs.pop("name", "Unknown")
 
-    def transform_log10(self, columns):
+    @staticmethod
+    def transform_log10(data, columns):
         # Compute log10 of data
-        log_data = self.data[columns].apply(["log10"])
+        log_data = data[columns].apply(["log10"])
         log_data.columns = log_data.columns.droplevel(1) + "_log10"
-        cols_to_use = self.data.columns.difference(log_data.columns)
-        self.data = pd.concat([self.data[cols_to_use], log_data], axis=1, verify_integrity=True)
+        cols_to_use = data.columns.difference(log_data.columns)
+        data = pd.concat([data[cols_to_use], log_data], axis=1, verify_integrity=True)
         return [col + '_log10' for col in columns]
 
     @staticmethod
@@ -27,6 +28,14 @@ class DistributionBaseClass:
         nb_col_index = pd.MultiIndex.from_tuples(tuples=nb_tuples)
         nb = pd.DataFrame(nb, index=row_values, columns=nb_col_index)
         return nb
+
+    @staticmethod
+    def scalar_to_list_if_scalar_and_not_none(val, n):
+        if val is not None and not isinstance(val, list):
+            # range_min is a scalar
+            return [val for _ in range(n)]
+        else:
+            return val
 
     @staticmethod
     def tile_scalar(val, row_values, columns, identifier='nb'):

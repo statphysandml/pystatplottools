@@ -1,4 +1,4 @@
-from ppd_pdf_env.loading_figure_mode import loading_figure_mode
+from pystatplottools.ppd_pdf_env.loading_figure_mode import loading_figure_mode
 fma, plt = loading_figure_mode(develop=True)
 
 
@@ -11,7 +11,7 @@ def probability_contour_plot():
     dataframe_indices = linearized_statistics.index.unique(0)
     print("Considered dataframes", dataframe_indices.values)
 
-    from ppd_plotting_env.contour2D import Contour2D
+    from pystatplottools.ppd_plotting_env.contour2D import Contour2D
     contour2D = Contour2D(
         data=linearized_statistics.loc["df2"],
         compute_x_func=lambda x: x["a"],  # possibility to rescale x and y axis or perform other operation for x axis
@@ -44,7 +44,7 @@ def plot_statistics_of_columns():
     dataframe_indices = linearized_statistics.index.unique(0)
     print("Considered dataframes", dataframe_indices.values)
 
-    from ppd_plotting_env.contour2D import Contour2D
+    from pystatplottools.ppd_plotting_env.contour2D import Contour2D
     contour2D = Contour2D(
         data=linearized_statistics.loc["df2"],
         compute_x_func=lambda x: x["a"],  # possibility to rescale x and y axis or perform other operation for x axis

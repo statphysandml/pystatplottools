@@ -1,4 +1,7 @@
 .idea/*
 __pychache__/
+dist/
+pystatplottools.egg-info/
+MANIFEST
 *.pyc
 *.pdf

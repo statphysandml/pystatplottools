@@ -1,4 +1,4 @@
-from ppd_pdf_env.loading_figure_mode import loading_figure_mode
+from pystatplottools.ppd_pdf_env.loading_figure_mode import loading_figure_mode
 fma, plt = loading_figure_mode(develop=True)
 
 
@@ -11,7 +11,7 @@ def probability_historam_plot():
     dataframe_indices = linearized_statistics.index.unique(0)
     print("Considered dataframes", dataframe_indices.values)
 
-    from ppd_plotting_env.histogram import Histogram
+    from pystatplottools.ppd_plotting_env.histogram import Histogram
 
     histogram = Histogram(data=linearized_statistics.loc["a"][["bin", "df1"]])
 

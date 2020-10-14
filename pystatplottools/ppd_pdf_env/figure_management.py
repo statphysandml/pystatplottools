@@ -6,6 +6,10 @@ mpl.use('pgf')
 # from http://bkanuka.com/posts/native-latex-plots/
 
 
+def dev_mode():
+    return False
+
+
 def figsize(scale, ratio=None):
     fig_width_pt = 267.0  # Get this from LaTeX using \the\textwidth
     inches_per_pt = 1.0 / 72.27  # Convert pt to inch
@@ -74,6 +78,7 @@ import matplotlib.pyplot as plt
 
 # I make my own newfig and savefig functions
 def newfig(width, **kwargs):
+    kwargs.pop('figsize', None)  # removes figsize from kwargs if it exists in kwargs
     ratio = kwargs.pop('ratio', None)
     if ratio is None:
         mpl.rcParams.update(pgf_with_latex)
@@ -85,6 +90,7 @@ def newfig(width, **kwargs):
 
 
 def surfacenewfig(width, **kwargs):
+    kwargs.pop('figsize', None)  # removes figsize from kwargs if it exists in kwargs
     ratio = kwargs.pop('ratio', None)
     if ratio is None:
         mpl.rcParams.update(pgf_with_latex)
@@ -115,11 +121,13 @@ def savefig(savedir_figures, path_to_out_file=None, type="pdf", extent=0):
         filename = os.path.join(savedir_figures, path_to_out_file)
         # plt.savefig('{}.pgf'.format(filename), bbox_inches='tight',  pad_inches=0.03)
         plt.savefig('{}.pdf'.format(filename), bbox_inches='tight',  pad_inches=0.03)
+        plt.close()
     elif path_to_out_file and type == "png":
         path_to_out_dir = os.path.dirname(os.path.join(savedir_figures, path_to_out_file))
         if not os.path.exists(path_to_out_dir):
             os.makedirs(path_to_out_dir)
         filename = os.path.join(savedir_figures, path_to_out_file)
         plt.savefig('{}.png'.format(filename), bbox_inches=extent, pad_inches=-0.5)
+        plt.close()
     else:
         assert 0, 'You have to enter a path, if you want to watch the figure change to figure development'

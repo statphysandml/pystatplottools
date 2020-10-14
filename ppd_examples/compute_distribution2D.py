@@ -2,14 +2,12 @@ from ppd_examples.mock_data import load_multivariate_mock_data
 data = load_multivariate_mock_data()
 
 
-from ppd_distributions.distributionDD import DistributionDD
+from pystatplottools.ppd_distributions.distributionDD import DistributionDD
 
 
 def compute_probability_distribution2D(z_index_name="probability"):
     dist2d = DistributionDD(data=data)
 
-    # Generate for each given column a two d distribution based on x_index and y_index as columns
-    # This is done separately for each initial dataset
     binned_statistics = dist2d.binned_statistics_over_axes(
         axes_indices=["a", "b"],
         range_min=[-5.0, -4.0],

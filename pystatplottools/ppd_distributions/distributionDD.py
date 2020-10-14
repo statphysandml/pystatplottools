@@ -146,7 +146,7 @@ class DistributionDD(DistributionBaseClass):
         for row in row_values:
             binned_statistics[row] = dict()
             for col in columns:
-                if statistic is "probability":
+                if statistic == "probability":
                     bin_statistic = lambda x: len(x) * 1.0 / len(self.data.loc[row])
                 if seperate_statistics:  # For 1D histrograms
                     sample_indices = col

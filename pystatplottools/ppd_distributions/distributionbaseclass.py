@@ -64,9 +64,9 @@ class DistributionBaseClass:
 
     @staticmethod
     def get_bin_properties(range_min, range_max, nbins, scale='Linear'):
-        if scale is "Linear":
+        if scale == "Linear":
             bin_edges = np.linspace(range_min, range_max, nbins + 1)
-        elif scale is "Logarithmic":
+        elif scale == "Logarithmic":
             bin_edges = np.logspace(np.log10(range_min), np.log10(range_max), nbins + 1)
         else:
             assert False, 'No scale given in get_bin_properties'

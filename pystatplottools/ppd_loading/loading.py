@@ -181,10 +181,10 @@ class ConfigurationLoader:
             data.insert(3, "StateImag", complex_config.apply(lambda x: x[1]))
             # data.drop("ComplexConfig", axis=1, inplace=True)
 
-        if "Drift" in data:
-            complex_drift = data.Drift.apply(lambda x: np.float32(x.split()))
-            data.insert(1, "DriftReal", complex_drift.apply(lambda x: x[0]))
-            data.insert(3, "DriftImag", complex_drift.apply(lambda x: x[1]))
+        # if "Drift" in data:
+        #     complex_drift = data.Drift.apply(lambda x: np.float32(x.split()))
+        #     data.insert(1, "DriftReal", complex_drift.apply(lambda x: x[0]))
+        #     data.insert(3, "DriftImag", complex_drift.apply(lambda x: x[1]))
             # data.drop("Drift", axis=1, inplace=True)
 
         if "RepaConfig" in data:

@@ -10,8 +10,10 @@ def load_json(path):
         return json.load(json_file)
 
 
-class ConfigurationLoader:
+class ConfigurationLoader(object):
     def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
         print("###### The configurations are flipped to ensure a balanced dataset between the two phases of the magnetization - this is only valid for"
               " models without an external field! ######")
 
@@ -198,7 +200,7 @@ class ConfigurationLoader:
 if __name__ == '__main__':
     configuration_loade_args = {
         # "path": "/home/lukas/Lattice_Git/PROJECTS/LUKAS/BoltzmannMachine/data/IsingModel/",
-        "path": "/home/lukas/LatticeModelImplementations/main_project/data/IsingModel",
+        "path": "/home/lukas/extrapolationphasestructure/Lukas/Code/data/IsingModelMetropolis",
         "chunksize": 100,
         "running_parameter": "beta",
         "total_number_of_data_per_file": 1000
@@ -207,7 +209,8 @@ if __name__ == '__main__':
     # loader = ConfigurationLoader(**configuration_loade_args)
 
     data, filenames = ConfigurationLoader.load_all_configurations(
-        path="/home/lukas/LatticeModelImplementations/main_project/data/IsingModel",
+        path="/home/lukas/extrapolationphasestructure/Lukas/Code/data/IsingModelMetropolis",
+        identifier="expectation_value",
         running_parameter="beta")
 
     pass

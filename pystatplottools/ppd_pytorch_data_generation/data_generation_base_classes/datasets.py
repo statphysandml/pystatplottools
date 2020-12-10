@@ -11,33 +11,17 @@ import numpy as np
 
 import torch_geometric.data as geometric_data
 
-
-'''Particular class that overloads the dataset generator of pytorch - for a better performance during training'''
-
-# Only used for a real time sampling -> True?
-class Dataset(torch_data.Dataset):
-    # Characterizes a dataset for PyTorch
-    def __init__(self, datagenerator, n):
-        super().__init__()
-        # Number of samples to be generated
-        self.n = n
-
-        # Auxiliary datagenerator
-        self.datagenerator = datagenerator
-
-    def __len__(self):
-        # Denotes the total number of samples
-        return self.n
-
-    def __getitem__(self, index):
-        # Generates one sample of data
-        return self.datagenerator.sampler()
-
-    def get_datagenerator(self):
-        return self.datagenerator
+'''
+Three datasets:
+- OnTheFlyDataset for the generation in real time
+- InMemoryDataset
+- GeometricInMemoryDataset
+'''
 
 
-class InMemoryDataset(object):
+
+# Base Class for InMemoryDatasets
+class InMemoryDatasetBaseClass(object):
     def __init__(self, root=None, transform=None, pre_transform=None, pre_filter=None):
         super().__init__(root, transform, pre_transform, pre_filter)
 
@@ -89,7 +73,7 @@ class InMemoryDataset(object):
             )
 
 
-class GeometricInMemoryDataset(InMemoryDataset, geometric_data.InMemoryDataset):
+class GeometricInMemoryDataset(InMemoryDatasetBaseClass, geometric_data.InMemoryDataset):
     def __init__(self, root, data_loader_name, transform=None, pre_transform=None, pre_filter=None, plain=False):
         self.data_generator_name = data_loader_name
 
@@ -121,7 +105,7 @@ class GeometricInMemoryDataset(InMemoryDataset, geometric_data.InMemoryDataset):
         torch.save((data, slices), self.processed_paths[0])
 
 
-class CustomInMemoryDataset(InMemoryDataset, torch_data.Dataset):
+class InMemoryDataset(InMemoryDatasetBaseClass, torch_data.Dataset):
     def __init__(self, root, data_loader_name, transform=None, pre_transform=None, pre_filter=None, plain=False):
         # Number of samples to be generated
 
@@ -193,3 +177,29 @@ class CustomInMemoryDataset(InMemoryDataset, torch_data.Dataset):
             torch.save((self.data, self.targets), f)
 
         print('Done!')
+
+
+'''Particular class that overloads the dataset generator of pytorch - for a better performance during training'''
+
+
+# Only used for a real time sampling -> True?
+class OnTheFlyDataset(torch_data.Dataset):
+    # Characterizes a dataset for PyTorch
+    def __init__(self, datagenerator, n):
+        super().__init__()
+        # Number of samples to be generated
+        self.n = n
+
+        # Auxiliary datagenerator
+        self.datagenerator = datagenerator
+
+    def __len__(self):
+        # Denotes the total number of samples
+        return self.n
+
+    def __getitem__(self, index):
+        # Generates one sample of data
+        return self.datagenerator.sampler()
+
+    def get_datagenerator(self):
+        return self.datagenerator

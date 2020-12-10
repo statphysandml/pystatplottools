@@ -30,8 +30,8 @@ def compute_probability_distribution1D_sort_by_column(z_index_name="probability"
 def compute_probability_distribution1D(z_index_name="probability"):
     dist1d = DistributionDD(data=data)
 
-    # Todo: Add exception - if axes_indices is not defined, an histogram is computed for each col - this
-    # also be another function!! and therefore also useful for DD distributions - based on subspaces
+    # Todo: Add exception - if axes_indices is not defined, an histogram is computed for each col - this can
+    #  also be another function!! and therefore also useful for DD distributions - based on subspaces
 
     binned_statistics = dist1d.binned_statistics_over_axes(
         axes_indices=["a"],

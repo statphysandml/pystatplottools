@@ -24,7 +24,7 @@ if __name__ == '__main__':
 
     compute_expectation_values_distribution1D()
 
-    probability_historam_plot()
+    # probability_historam_plot()
 
     probability_contour_plot()
     plot_statistics_of_columns()

@@ -13,7 +13,7 @@ import torch_geometric.data as geometric_data
 
 '''
 Three datasets:
-- OnTheFlyDataset for the generation in real time
+- InRealTimeDataset for the generation in real time
 - InMemoryDataset
 - GeometricInMemoryDataset
 '''
@@ -207,7 +207,7 @@ class InMemoryDataset(InMemoryDatasetBaseClass, torch_data.Dataset):
 
 
 # Only used for a real time sampling -> True?
-class OnTheFlyDataset(torch_data.Dataset):
+class InRealTimeDataset(torch_data.Dataset):
     # Characterizes a dataset for PyTorch
     def __init__(self, datagenerator, n):
         super().__init__()

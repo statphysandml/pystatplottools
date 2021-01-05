@@ -22,8 +22,8 @@ def load_in_real_time_data_loader(
         data_generator_func=data_generator_func
     )
 
-    from pystatplottools.pytorch_data_generation.pytorch_data_utils.datasets import OnTheFlyDataset
-    dataset = OnTheFlyDataset(datagenerator=data_generator, n=n)
+    from pystatplottools.pytorch_data_generation.pytorch_data_utils.datasets import InRealTimeDataset
+    dataset = InRealTimeDataset(datagenerator=data_generator, n=n)
 
     from pystatplottools.pytorch_data_generation.pytorch_data_utils.dataloaders import data_loader_factory
     data_loader = data_loader_factory(data_loader_name=data_loader_name)

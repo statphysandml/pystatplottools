@@ -6,7 +6,7 @@ from examples.rectangle_data_generator import RectangleGenerator, data_generator
 
 if __name__ == '__main__':
 
-    ''' Normal DataLoader and RectangleGenerator with an OnTheFlyDataset '''
+    ''' Normal DataLoader and RectangleGenerator with an InRealTimeDataset '''
 
     data_generator = RectangleGenerator(
         # DataGeneratoreBaseClass Args
@@ -19,8 +19,8 @@ if __name__ == '__main__':
     # Possible usage:
     # sample = data_generator.sampler()
 
-    from pystatplottools.pytorch_data_generation.pytorch_data_utils.datasets import OnTheFlyDataset
-    dataset = OnTheFlyDataset(datagenerator=data_generator, n=10000)
+    from pystatplottools.pytorch_data_generation.pytorch_data_utils.datasets import InRealTimeDataset
+    dataset = InRealTimeDataset(datagenerator=data_generator, n=10000)
 
     from pystatplottools.pytorch_data_generation.pytorch_data_utils.dataloaders import DataLoader
     data_loader_params = {

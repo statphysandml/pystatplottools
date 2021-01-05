@@ -1,4 +1,4 @@
-# Based on from the Code from http://bkanuka.com/posts/native-latex-plots/ (Practical Machine Learning)
+# Based on the Code from http://bkanuka.com/posts/native-latex-plots/ (Practical Machine Learning)
 
 
 def loading_figure_mode(develop=False):

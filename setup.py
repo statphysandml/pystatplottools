@@ -14,6 +14,12 @@ setup(name='pystatplottools',
       author='Lukas Kades',
       author_email='lukaskades@googlemail.com',
       # url='https://www.python.org/sigs/distutils-sig/',
-      packages=['pystatplottools', 'pystatplottools.ppd_distributions',
-                'pystatplottools.ppd_pdf_env', 'pystatplottools.ppd_plotting_env', 'pystatplottools.ppd_loading']
+      packages=['pystatplottools',
+                'pystatplottools.distributions',
+                'pystatplottools.expectation_values'
+                'pystatplottools.pdf_env',
+                'pystatplottools.plotting',
+                'pystatplottools.pytorch_data_generation',
+                'pystatplottools.utils',
+                'pystatplottools.visualization']
      )

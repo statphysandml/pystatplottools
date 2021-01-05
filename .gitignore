@@ -1,7 +1,10 @@
 .idea/*
+.ipynb_checkpoints/
 __pychache__/
 dist/
 pystatplottools.egg-info/
+examples/data/
+examples/results/
 MANIFEST
 *.pyc
 *.pdf

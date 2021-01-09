@@ -40,11 +40,11 @@ from pystatplottools.distributions.joint_distribution import JointDistribution
 Dependencies
 ------------
 
-matplotlib
-numpy
-pandas
-scipy
-(jupyterlab)
+- matplotlib
+- numpy
+- pandas
+- scipy
+- (jupyterlab)
 
 Projects using the pystatplottools
 ----------------------------------

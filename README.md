@@ -10,6 +10,11 @@ A python library that simplifies working with and plotting of statistical data a
 - **visualization** - Contains a class for visualizing samples and batches from the dataset and a decorator for handling figures
 - **pdf_env** - Adapted tool for an easy saving of plots as pdfs and pngs. The original code can be found on http://bkanuka.com/posts/native-latex-plots/ .
 
+Examples
+--------
+
+Examples to the different python modules can be found in the examples/ folder. A more detailed example which covers almost all functionalities of the library can be found here: https://github.com/statphysandml/pystatplottools/blob/master/examples/cheat_sheet.ipynb.
+
 Integration
 -----------
 
@@ -32,10 +37,14 @@ import pystatplottools
 from pystatplottools.distributions.joint_distribution import JointDistribution
 ```
 
-Examples
---------
+Dependencies
+------------
 
-Examples to the different python modules can be found in the examples/ folder. A more detailed example which covers almost all of the functionalities of the library can be found here: https://github.com/statphysandml/pystatplottools/blob/master/examples/cheat_sheet.ipynb.
+matplotlib
+numpy
+pandas
+scipy
+(jupyterlab)
 
 Projects using the pystatplottools
 ----------------------------------

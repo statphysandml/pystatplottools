@@ -21,7 +21,7 @@ class DiagramBaseClass:
         return data[index].min(), data[index].max()
 
     @staticmethod
-    def get_exp_norm_and_levs(lev_min, lev_max, lev_num):
+    def get_log_norm_and_levs(lev_min, lev_max, lev_num):
         lev_exp = np.linspace(np.log10(lev_min), np.log10(lev_max), lev_num)  # 0.5
         levs = np.power(10, lev_exp)
 
@@ -51,11 +51,8 @@ class DiagramBaseClass:
             plt.setp(self._ax.get_yticklabels(), visible=False)
 
     def add_fancy_box(self, legend_name):
-        from matplotlib.lines import Line2D
-        custom_lines = [Line2D([0], [0], linestyle="--", color="white")]
-        legend = self._ax.legend(custom_lines, [legend_name], loc="upper right", framealpha=1, fancybox=False,
-                                 handlelength=0.0, handletextpad=0)
-        return legend
+        from pystatplottools.visualization.utils import add_fancy_legend_box
+        return add_fancy_legend_box(ax=self._ax, name=legend_name)
 
     def set_ticks(self, x_ticks, y_ticks):
         assert False, "To be implemented"

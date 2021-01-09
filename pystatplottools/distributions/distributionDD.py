@@ -405,6 +405,9 @@ class DistributionDD:
         col = x.columns.get_level_values(0).values[0]
         results = dict()
         for idx in x.index.values:
+            assert x.loc[idx][col, 'min'] != x.loc[idx][col, 'max'] or nbins == 1,\
+                "Computation of a histogram/distribution for " + str(col) + " currently not possible since all values are equal." \
+                "Consider to take out " + str(col) + " from your distribution."
             results[idx] = DistributionDD._get_bin_properties(range_min=x.loc[idx][col, 'min'],
                                                               range_max=x.loc[idx][col, 'max'],
                                                               nbins=x.loc[idx][col, 'nbins'],

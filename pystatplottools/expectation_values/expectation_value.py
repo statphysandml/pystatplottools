@@ -36,14 +36,6 @@ def fourthmoment(x):
     return pow(x, 4).mean()
 
 
-def compute_specificheat(dist, N):
-    dist.expectation_values["SpecificHeat", "mean"] = pow(dist.expectation_values['Beta', 'mean'], 2)/N*(dist.expectation_values['Energy', 'secondmoment']-pow(dist.expectation_values['Energy', 'mean'], 2))
-
-
-def compute_binder_cumulant(dist):
-    dist.expectation_values["BinderCumulant", "mean"] = 1 - dist.expectation_values['Mean', 'fourthmoment']/(3*pow(dist.expectation_values['Mean', 'secondmoment'], 2))
-
-
 class ExpectationValue:
     def __init__(self, **kwargs):
         self.data = kwargs.pop("data", None)

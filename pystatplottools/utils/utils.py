@@ -36,4 +36,4 @@ def add_index_level(data, key="df"):
 
 def drop_index_level(data, single_key="df"):
     import pandas as pd
-    return pd.concat([data.reset_index().drop("level_1", axis=1)], keys=[single_key])
+    return pd.concat([data.reset_index(level=1, drop=True).reset_index()], keys=[single_key])

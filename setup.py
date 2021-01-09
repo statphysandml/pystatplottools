@@ -9,7 +9,7 @@
 from distutils.core import setup
 
 setup(name='pystatplottools',
-      version='1.0',
+      version='0.1',
       description='Python modules for performing simple statistics and plotting routines',
       author='Lukas Kades',
       author_email='lukaskades@googlemail.com',

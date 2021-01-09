@@ -44,7 +44,7 @@ def im_single_sample(ax, sample, config_dim, label=None, minmax=None, ab=None, n
 @figure_decorator
 def fd_im_single_sample(sample, config_dim, label=None, minmax=None, ab=None, num_std=None, cmap='viridis',
                         filename=None, directory=None, title=None, fig=None, ax=None, fma=None, figsize=(10, 7),
-                        width=1.3, type="png", **kwargs):
+                        width=1.3, type="png", ratio=None, **kwargs):
     im_single_sample(ax=ax, sample=sample, config_dim=config_dim, label=label, minmax=minmax, ab=ab, num_std=num_std,
                      cmap=cmap, **kwargs)
 
@@ -66,18 +66,20 @@ def im_batch(ax, batch_repr, config_dim, batch_labels=None, num_samples=None, mi
 
     if batch_labels is None:
         for idx, dat in enumerate(batch):
+            # (Samples are already properly rescaled)
             im_single_sample(ax=ax[np.unravel_index(idx, (dim[0], dim[1]))], sample=dat, config_dim=config_dim,
-                             minmax=minmax, ab=ab, num_std=num_std, cmap=cmap, **kwargs)
+                             minmax=None, ab=(0, 1), num_std=None, cmap=cmap, **kwargs)
     else:
         for idx, (dat, label) in enumerate(zip(batch, batch_labels)):
+            # (Samples are already properly rescaled)
             im_single_sample(ax=ax[np.unravel_index(idx, (dim[0], dim[1]))], sample=dat, config_dim=config_dim,
-                             label=label, minmax=minmax, ab=ab, num_std=num_std, cmap=cmap, **kwargs)
+                             label=label, minmax=None, ab=(0, 1), num_std=None, cmap=cmap, **kwargs)
 
 
 @figure_decorator
 def fd_im_batch(batch_repr, config_dim, batch_labels=None, num_samples=None, minmax=None, ab=None, num_std=None,
                 cmap='viridis', filename=None, directory=None, title=None, fig=None, ax=None, fma=None, figsize=(10, 7),
-                width=1.3, type="png", dim=(6, 6), **kwargs):
+                width=1.3, type="png", ratio=None, dim=(6, 6), **kwargs):
     im_batch(ax=ax, batch_repr=batch_repr, config_dim=config_dim, batch_labels=batch_labels, num_samples=num_samples,
              minmax=minmax, ab=ab, num_std=num_std, cmap=cmap, **kwargs)
 
@@ -114,7 +116,7 @@ def im_batch_grid(ax, batch_repr, config_dim, num_samples=None, nrow=12, minmax=
 @figure_decorator
 def fd_im_batch_grid(batch_repr, config_dim, num_samples=None, nrow=12, minmax=None, ab=None, num_std=None,
                      filename=None, directory=None, title=None, fig=None, ax=None, fma=None, figsize=(10, 7),
-                     width=1.3, type="png", **kwargs):
+                     width=1.3, type="png", ratio=None, **kwargs):
     im_batch_grid(ax=ax, batch_repr=batch_repr, config_dim=config_dim, num_samples=num_samples, nrow=nrow,
                   minmax=minmax, ab=ab, num_std=num_std, title=title, **kwargs)
 
@@ -168,9 +170,13 @@ def _a_b_to_zero_one(data, ab):
 
 
 def _minmax_rescale_data(data, minmax):
-    return (data - data.min()) / (data.max() - data.min()) * (
-            minmax[1] - minmax[0]
-    ) + minmax[0]
+    if data.max() == data.min():
+        print("Unique color for data sample - better use ab parameter than minmax.")
+        return data
+    else:
+        return (data - data.min()) / (data.max() - data.min()) * (
+                minmax[1] - minmax[0]
+        ) + minmax[0]
 
 
 def _rescale_num_std_to_zero_one(data, num_std):

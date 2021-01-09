@@ -58,9 +58,9 @@ class Contour2D(DiagramBaseClass):
 
         if cbar_scale is None:
             assert (levs is not None) and (norm is not None), "levs and norm need to be defined if cbar_scale is None"
-        elif cbar_scale == "Exp":
+        elif cbar_scale == "Log":
             assert (levs is None) and (norm is None), "levs and norm cannot be defined when cbar_scale is defined"
-            norm, levs = self.get_exp_norm_and_levs_of_z(lev_num=lev_num)
+            norm, levs = self.get_log_norm_and_levs_of_z(lev_num=lev_num)
             self.data_z[isnan_mask] = self.data_z.min()
         elif cbar_scale == "Lin":
             assert (levs is None) and (norm is None), "levs and norm cannot be defined when cbar_scale is defined"
@@ -81,9 +81,9 @@ class Contour2D(DiagramBaseClass):
     def get_min_max_of_z(self):
         return Contour2D.get_min_max_of_index(data=self.data, index=self.z_index)
 
-    def get_exp_norm_and_levs_of_z(self, lev_num):
+    def get_log_norm_and_levs_of_z(self, lev_num):
         lev_min, lev_max = self.get_min_max_of_z()
-        return Contour2D.get_exp_norm_and_levs(lev_min=lev_min, lev_max=lev_max, lev_num=lev_num)
+        return Contour2D.get_log_norm_and_levs(lev_min=lev_min, lev_max=lev_max, lev_num=lev_num)
 
     def get_lin_norm_and_levs_of_z(self, lev_num):
         lev_min, lev_max = self.get_min_max_of_z()

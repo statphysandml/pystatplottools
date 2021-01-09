@@ -12,6 +12,7 @@ def figure_decorator(func):
         figsize = kwargs.pop("figsize", (10, 7))
         width = kwargs.pop("width", 1.0)
         type = kwargs.pop("type", "png")
+        ratio = kwargs.pop("ratio", None)
         dim = kwargs.pop("dim", None)
 
         import matplotlib.pyplot as plt
@@ -27,9 +28,9 @@ def figure_decorator(func):
             # Generate fma like figure
             # width is for the latex pdf file and figsize for plotting directly in jupyter notebook!
             if dim is not None:
-                fig, ax = fma.newfig(nrows=dim[0], ncols=dim[1], width=width, figsize=figsize)
+                fig, ax = fma.newfig(nrows=dim[0], ncols=dim[1], width=width, figsize=figsize, ratio=ratio)
             else:
-                fig, ax = fma.newfig(width=width, figsize=figsize)
+                fig, ax = fma.newfig(width=width, figsize=figsize, ratio=ratio)
 
         kwargs["fig"] = fig
         kwargs["ax"] = ax
@@ -49,3 +50,11 @@ def figure_decorator(func):
 
         return fig, ax
     return decorated
+
+
+def add_fancy_legend_box(ax, name):
+    from matplotlib.lines import Line2D
+    custom_lines = [Line2D([0], [0], linestyle="--", color="white")]
+    legend = ax.legend(custom_lines, [name], loc="upper right", framealpha=1, fancybox=False,
+                       handlelength=0.0, handletextpad=0)
+    return legend

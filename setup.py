@@ -13,7 +13,6 @@ setup(name='pystatplottools',
       description='Python modules for performing simple statistics and plotting routines',
       author='Lukas Kades',
       author_email='lukaskades@googlemail.com',
-      # url='https://www.python.org/sigs/distutils-sig/',
       packages=['pystatplottools',
                 'pystatplottools.distributions',
                 'pystatplottools.expectation_values'

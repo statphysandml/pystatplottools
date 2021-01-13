@@ -7,14 +7,14 @@ def mean(x):
 
 
 def std(x):
-    if x.iloc[0].dtype == np.complex:
+    if np.iscomplexobj(x.iloc[0]):
         return x.agg(lambda y: np.real(y.to_numpy()).std() + 1.0j * np.imag(y.to_numpy()).std())
     else:
         return x.std()
 
 
 def var(x):
-    if x.iloc[0].dtype == np.complex:
+    if np.iscomplexobj(x.iloc[0]):
         return x.apply(lambda y: np.real(y.to_numpy()).std() + 1.0j * np.imag(y.to_numpy()).var())
     else:
         return x.var()

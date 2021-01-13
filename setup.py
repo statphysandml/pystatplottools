@@ -15,5 +15,5 @@ setup(name='pystatplottools',
                 'pystatplottools.plotting',
                 'pystatplottools.pytorch_data_generation',
                 'pystatplottools.utils',
-                'pystatplottools.visualization']
+                'pystatplottools.visualization'],
      )

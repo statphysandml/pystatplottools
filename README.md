@@ -46,7 +46,7 @@ Dependencies
 - scipy
 - (jupyter lab)
 
-Projects using the pystatplottools
-----------------------------------
+Projects using the pystatplottools library
+------------------------------------------
 
 - MCMCEvalutionLib (https://github.com/statphysandml/MCMCEvaluationLib)

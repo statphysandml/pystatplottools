@@ -13,7 +13,7 @@ def figure_decorator(func):
         width = kwargs.pop("width", 1.0)
         type = kwargs.pop("type", "png")
         ratio = kwargs.pop("ratio", None)
-        dim = kwargs.pop("dim", None)
+        dim = kwargs.get("dim", None)
 
         import matplotlib.pyplot as plt
         ownfig = False

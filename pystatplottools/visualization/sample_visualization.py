@@ -81,7 +81,7 @@ def fd_im_batch(batch_repr, config_dim, batch_labels=None, num_samples=None, min
                 cmap='viridis', filename=None, directory=None, title=None, fig=None, ax=None, fma=None, figsize=(10, 7),
                 width=1.3, type="png", ratio=None, dim=(6, 6), **kwargs):
     im_batch(ax=ax, batch_repr=batch_repr, config_dim=config_dim, batch_labels=batch_labels, num_samples=num_samples,
-             minmax=minmax, ab=ab, num_std=num_std, cmap=cmap, **kwargs)
+             minmax=minmax, ab=ab, num_std=num_std, dim=dim, cmap=cmap, **kwargs)
 
 
 def im_batch_grid(ax, batch_repr, config_dim, num_samples=None, nrow=12, minmax=None, ab=None, num_std=None, title=None,

@@ -10,9 +10,9 @@ def im_single_sample(ax, sample, config_dim, label=None, minmax=None, ab=None, n
         try:
             import torch
             if isinstance(label, torch.Tensor):
-                label = ', '.join(list(label.cpu().numpy().reshape(-1).astype(str)))
+                label = b', '.join(list(label.cpu().numpy().reshape(-1).astype('|S5')))[:30].decode("utf-8")   # Maximum label length: 30
             else:
-                label = ', '.join(list(np.array(label).reshape(-1).astype(str)))
+                label = b', '.join(list(np.array(label).reshape(-1).astype('|S5')))[:30].decode("utf-8")   # Maximum label length: 30
         except ModuleNotFoundError:
             pass
 
@@ -84,7 +84,7 @@ def fd_im_batch(batch_repr, config_dim, batch_labels=None, num_samples=None, min
              minmax=minmax, ab=ab, num_std=num_std, dim=dim, cmap=cmap, **kwargs)
 
 
-def im_batch_grid(ax, batch_repr, config_dim, num_samples=None, nrow=12, minmax=None, ab=None, num_std=None, title=None,
+def im_batch_grid(ax, batch_repr, config_dim, num_samples=None, ncol=12, minmax=None, ab=None, num_std=None, title=None,
                   **kwargs):
 
     if 'norm' not in kwargs.keys() and (minmax is None and ab is None and num_std is None):
@@ -101,7 +101,7 @@ def im_batch_grid(ax, batch_repr, config_dim, num_samples=None, nrow=12, minmax=
 
     from torchvision import utils
     import torch
-    out = utils.make_grid(torch.tensor(batch), nrow=nrow)
+    out = utils.make_grid(torch.tensor(batch), nrow=ncol)
     grid = out.cpu().numpy().transpose((1, 2, 0))
     if 'norm' in kwargs.keys():
         ax.imshow(grid, **kwargs)
@@ -114,10 +114,10 @@ def im_batch_grid(ax, batch_repr, config_dim, num_samples=None, nrow=12, minmax=
 
 
 @figure_decorator
-def fd_im_batch_grid(batch_repr, config_dim, num_samples=None, nrow=12, minmax=None, ab=None, num_std=None,
+def fd_im_batch_grid(batch_repr, config_dim, num_samples=None, ncol=12, minmax=None, ab=None, num_std=None,
                      filename=None, directory=None, title=None, fig=None, ax=None, fma=None, figsize=(10, 7),
                      width=1.3, type="png", ratio=None, **kwargs):
-    im_batch_grid(ax=ax, batch_repr=batch_repr, config_dim=config_dim, num_samples=num_samples, nrow=nrow,
+    im_batch_grid(ax=ax, batch_repr=batch_repr, config_dim=config_dim, num_samples=num_samples, ncol=ncol,
                   minmax=minmax, ab=ab, num_std=num_std, title=title, **kwargs)
 
 

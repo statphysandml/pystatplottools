@@ -50,3 +50,11 @@ Projects using the pystatplottools library
 ------------------------------------------
 
 - MCMCEvalutionLib (https://github.com/statphysandml/MCMCEvaluationLib)
+
+Support and development
+----------------------
+
+For bug reports/suggestions/complaints please file an issue on GitHub.
+
+Or start a discussion on our mailing list: statphysandml@thphys.uni-heidelberg.de
+

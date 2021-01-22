@@ -2,10 +2,16 @@ from abc import ABCMeta
 import numpy as np
 
 
-class DataGeneratorBaseClass:
+from pystatplottools.utils.multiple_inheritance_base_class import MHBC
+
+
+class DataGeneratorBaseClass(MHBC):
     __metaclass__ = ABCMeta
 
     def __init__(self, **kwargs):
+        # For child classes with more than one parent class
+        super().__init__(**kwargs)
+
         self.device = kwargs.pop('device', "cpu")
 
         # Determines if a seed is set or not
@@ -24,6 +30,9 @@ class DataGeneratorBaseClass:
 
         self.inp_size = None
         self.tar_size = None
+
+        # skip_loading_data_in_init is an argument to skip loading the data in the data generator
+        self.skip_loading_data_in_init = kwargs.pop("skip_loading_data_in_init", False)
 
     def input_size(self):
         return self.inp_size

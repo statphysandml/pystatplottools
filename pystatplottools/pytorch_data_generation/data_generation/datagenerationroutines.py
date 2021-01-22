@@ -48,14 +48,15 @@ def prepare_in_memory_dataset(
         data_generator_args["batch_size"] = batch_size
 
     # To get n and to verify if data_generator can generate batches
+    # (skip_loading_data_in_init is an argument to skip loading the data in the data generator)
     datagenerator, n = generate_data_generator(
-        data_generator_args=data_generator_args, device="cpu", n=n, seed=seed, set_seed=set_seed,
+        data_generator_args={**data_generator_args, "skip_loading_data_in_init": True}, device="cpu", n=n, seed=seed, set_seed=set_seed,
         data_generator_name=data_generator_name, data_generator_factory=data_generator_factory,
         data_generator_func=data_generator_func
     )
 
     if batch_size is not None and not hasattr(datagenerator, "batch_size"):
-        assert False, "Data generator is expexted to generate batches instead of single samples. " \
+        assert False, "Data generator is expected to generate batches instead of single samples. " \
                       "Setting a batch_size is not reasonable in this case. Consider to remove your argument for " \
                       "batch size or define a datagenerator that has an attribute batch_size and generated batches " \
                       "with batch size batch_size"

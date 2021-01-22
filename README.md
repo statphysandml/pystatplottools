@@ -52,7 +52,7 @@ Projects using the pystatplottools library
 
 - MCMCEvalutionLib (https://github.com/statphysandml/MCMCEvaluationLib)
 
-Support and development
+Support and Development
 ----------------------
 
 For bug reports/suggestions/complaints please file an issue on GitHub.

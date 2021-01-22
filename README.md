@@ -6,14 +6,14 @@ A Python library that simplifies working with and plotting of statistical data a
 - **distributions** - Convenient computation of joint and marginal distributions. In addition, binned statistics can be evaluated.
 - **expectation_values** - Computation of expectation values.
 - **plotting** - Wrapper for plotting 2D contour plots with linear and logarithmic scales.
-- **pytorch_data_generation** - Tools for an easy generation and storage of a custom pytorch datasets. The data can be pregenerated and stored as a .pt file. Alternatively, data can be generated in real time.
+- **pytorch_data_generation** - Tools for an easy generation and storage of a custom PyTorch datasets. The data can be pregenerated and stored as a .pt file. Alternatively, data can be generated in real time.
 - **visualization** - Contains a class for visualizing samples and batches from the dataset and a decorator for handling figures
 - **pdf_env** - Adapted tool for an easy saving of plots as pdfs and pngs. The original code can be found on http://bkanuka.com/posts/native-latex-plots/.
 
 Examples
 --------
 
-Examples to the different python modules can be found in the examples/ folder. A more detailed example which covers almost all functionalities of the library can be found here: https://github.com/statphysandml/pystatplottools/blob/master/examples/cheat_sheet.ipynb.
+Examples to the different Python modules can be found in the examples/ folder. A more detailed example which covers almost all functionalities of the library can be found here: https://github.com/statphysandml/pystatplottools/blob/master/examples/cheat_sheet.ipynb.
 
 Integration
 -----------
@@ -44,6 +44,7 @@ Dependencies
 - numpy
 - pandas
 - scipy
+- (pytorch)
 - (jupyter lab)
 
 Projects using the pystatplottools library

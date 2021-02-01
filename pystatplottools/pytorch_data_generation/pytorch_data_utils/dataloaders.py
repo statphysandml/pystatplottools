@@ -65,7 +65,8 @@ class HelperIterBatchDataLoader:
     def _next(self):
         while self.i < self.n:
             batch = self.dataset[self.i]
-            if self.raw_samples:
+
+            if self.raw_samples or hasattr(batch, "batch"):  # Second condition is for geometric datasets
                 # No collate_fn takes place
                 pass
             else:
@@ -86,5 +87,8 @@ class HelperIterBatchDataLoader:
 def data_loader_factory(data_loader_name="default"):
     if data_loader_name == "BatchDataLoader":
         return BatchDataLoader
+    elif data_loader_name == "GeometricDataLoader":
+        from pystatplottools.pytorch_data_generation.pytorch_geometric_utils.dataloaders import GeometricDataLoader
+        return GeometricDataLoader
     else:
         return DataLoader

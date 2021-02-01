@@ -9,20 +9,23 @@ from torch.utils.data import _utils
 default_collate = _utils.collate.default_collate
 import numpy as np
 
-import torch_geometric.data as geometric_data
+
+from pystatplottools.utils.multiple_inheritance_base_class import MHBC
+
 
 '''
 Three datasets:
 - InRealTimeDataset for the generation in real time
 - InMemoryDataset
-- GeometricInMemoryDataset
+- GeometricInMemoryDataset (see pytorch_geometric_utils.datasets)
 '''
 
 
 # Base Class for InMemoryDatasets
-class InMemoryDatasetBaseClass(object):
+class InMemoryDatasetBaseClass(MHBC):
     def __init__(self, root=None, transform=None, pre_transform=None, pre_filter=None):
-        self.initialize(root, transform, pre_transform, pre_filter)
+        # For child classes with more than one parent class
+        super().__init__(root=None, transform=None, pre_transform=None, pre_filter=None)
 
     # Can be used as a replacement for __init__ if base constructors do not coincide in the case of multiple inheritance
     def initialize(self, data_generator_factory, root=None, transform=None, pre_transform=None, pre_filter=None):
@@ -79,45 +82,10 @@ class InMemoryDatasetBaseClass(object):
             )
 
 
-class GeometricInMemoryDataset(InMemoryDatasetBaseClass, geometric_data.InMemoryDataset):
-    def __init__(self, root, sample_data_generator_name, transform=None, pre_transform=None, pre_filter=None, plain=False):
-        self.sample_data_generator_name = sample_data_generator_name
-
-        super().__init__(root, transform, pre_transform, pre_filter)
-
-        self.plain = plain
-        self.data, self.slices = torch.load(self.processed_paths[0])
-
-        if self.sample_data_generator_name is not None:
-            self.datagenerator = self.build_datagenerator(self.raw_dir, self.raw_file_names, self.sample_data_generator_name)
-
-    def download(self):
-        pass
-
-    def process(self):
-        self.datagenerator = self.build_datagenerator(self.raw_dir, self.raw_file_names, self.sample_data_generator_name)
-
-        data_list = []
-        for _ in range(int(self.n / self.datagenerator.batch_size)):
-            data_list += self.datagenerator.sampler().to_data_list()
-
-        if self.pre_filter is not None:
-            data_list = [data for data in data_list if self.pre_filter(data)]
-
-        if self.pre_transform is not None:
-            data_list = [self.pre_transform(data) for data in data_list]
-
-        # Is it maybe better to collate while generation -> to save memory?
-        data, slices = self.collate(data_list)
-        torch.save((data, slices), self.processed_paths[0])
-
-
 # Loads dataset from file if generated or generates in the process function
 # -> in the latter case, the datagenerator needs a sampler function
-class InMemoryDataset(InMemoryDatasetBaseClass, torch_data.Dataset):
+class InMemoryDataset(torch_data.Dataset, InMemoryDatasetBaseClass):
     def __init__(self, root, data_generator_factory, sample_data_generator_name=None, transform=None, pre_transform=None, pre_filter=None, plain=False, collate_fn=default_collate):
-        # Number of samples to be generated
-
         super().initialize(data_generator_factory, root, transform, pre_transform, pre_filter)
 
         self.plain = plain

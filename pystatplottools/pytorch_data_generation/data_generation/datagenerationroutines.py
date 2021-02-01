@@ -91,7 +91,7 @@ def prepare_in_memory_dataset(
 
 # Generic data loader class
 def load_in_memory_dataset(root, batch_size, data_generator_factory, slices=None, shuffle=True, num_workers=0,
-                     rebuild=False, sample_data_generator_name=None):
+                     rebuild=False, sample_data_generator_name=None, dataset_type="standard"):
     assert os.path.isfile(root + "/raw/config.json"), "Cannot load data, data generation config file is not provided."
 
     # Data loader is generated based on data in memory (or will be generated based on /raw/config.json for the first
@@ -102,16 +102,24 @@ def load_in_memory_dataset(root, batch_size, data_generator_factory, slices=None
         shutil.rmtree(root + "/processed/")
 
     # Load Dataset
-    from pystatplottools.pytorch_data_generation.pytorch_data_utils.datasets import InMemoryDataset
-    dataset = InMemoryDataset(root=root, sample_data_generator_name=sample_data_generator_name,
-                              data_generator_factory=data_generator_factory)
+    if dataset_type == "standard":
+        from pystatplottools.pytorch_data_generation.pytorch_data_utils.datasets import InMemoryDataset
+        dataset = InMemoryDataset(root=root, sample_data_generator_name=sample_data_generator_name,
+                                  data_generator_factory=data_generator_factory)
+    else:
+        from pystatplottools.pytorch_data_generation.pytorch_geometric_utils.datasets import GeometricInMemoryDataset
+        dataset = GeometricInMemoryDataset(root=root, sample_data_generator_name=sample_data_generator_name,
+                                           data_generator_factory=data_generator_factory)
 
     if slices is not None:
         dataset = dataset[slices[0]:slices[1]]
         dataset.n = slices[1] - slices[0]
 
     from pystatplottools.pytorch_data_generation.pytorch_data_utils.dataloaders import data_loader_factory
-    data_loader_func = data_loader_factory(data_loader_name="DataLoader")  # InMemoryDataset cannot handle .pt loaded data
+    if dataset_type == "standard":
+        data_loader_func = data_loader_factory(data_loader_name="DataLoader")
+    else:
+        data_loader_func = data_loader_factory(data_loader_name="GeometricDataLoader")
 
     data_loader_params = {
         'batch_size': batch_size,  # -> Set since BatchDataLoader is not used

@@ -1,3 +1,4 @@
+import numpy as np
 import torch
 import torch_geometric.data as geometric_data
 
@@ -24,6 +25,17 @@ class GeometricInMemoryDataset(InMemoryDatasetBaseClass, geometric_data.InMemory
 
     def download(self):
         pass
+
+    def get_random_batch(self, batch_size):
+        rn = np.random.choice(self.n, batch_size)
+
+        from torch_geometric.data import Batch
+        batch_data = [self[int(i)] for i in rn]
+        return Batch.from_data_list(batch_data)
+
+    def get_random_sample(self):
+        rn = np.random.randint(0, self.n)
+        return self[rn]
 
     def process(self):
         self.datagenerator = self.build_datagenerator(self.raw_dir, self.raw_file_names)

@@ -138,7 +138,7 @@ def prepare_visualizatiion(repr, config_dim, num_samples=16, minmax=None, ab=Non
     try:
         import torch
         if isinstance(repr, torch.Tensor):
-            repr = repr.cpu().numpy()
+            repr = repr.detach().cpu().numpy()
         else:
             repr = repr
     except ModuleNotFoundError:
@@ -184,14 +184,3 @@ def _rescale_num_std_to_zero_one(data, num_std):
     maxi = data.mean() + num_std * data.std()
     rescaled_data = (data - mini) / (maxi - mini)
     return np.clip(rescaled_data, 0.0, 1.0)
-
-
-# Optional function for converting given output from the train_loader to a corresponding batch
-
-def batch_converter(batch):
-    if isinstance(batch, list) or isinstance(batch, tuple):
-        batch_y = batch[1]
-        batch = batch[0]
-    else:
-        batch_y = batch.y
-    return batch, batch_y

@@ -106,7 +106,8 @@ class DistributionDD:
                                     range_min=None,
                                     range_max=None,
                                     bin_scales='linear',
-                                    with_binnumber=False):
+                                    with_binnumber=False,
+                                    expand_binnumbers=False):
         """
         Computes a joint probability distribution/histogram of axes_indices over binned values of the data frame
         self.data or computes binned statistics over binned samples. The function makes of numpy's binned_statistic_dd
@@ -163,7 +164,7 @@ class DistributionDD:
                     print("Not all data points are in the given ranges")
                 hist, binedges, binnumber = binned_statistic_dd(
                     sample=self.data.loc[row][sample_indices].values[data_in_range_mask], values=self.data.loc[row][col].values[data_in_range_mask], statistic=bin_statistic,
-                    bins=[histogram_prep[ax_idx][row]['binedges'] for ax_idx in sample_indices])
+                    bins=[histogram_prep[ax_idx][row]['binedges'] for ax_idx in sample_indices], expand_binnumbers=expand_binnumbers)
                 binscale = [histogram_prep[ax_idx][row]['binscale'] for ax_idx in sample_indices]
 
                 out_key = col

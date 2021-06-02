@@ -1,6 +1,7 @@
 import os
 import shutil
 import json
+import copy
 
 
 # Generate a data loader based on the given parameters with an OnTheFlyDataaset
@@ -9,6 +10,13 @@ def load_in_real_time_data_loader(
         batch_size, data_generator_args, device=None, n=None, seed=0, set_seed=True,
         data_generator_name=None, data_generator_factory=None, data_generator_func=None,
         data_loader_params=None, data_loader_name="DataLoader", raw_samples=False, shuffle=True, num_workers=0):
+
+    # ToDo: Adapt (copy.deepcopy)
+    # data_generator_args, data_loader_params = prepare_data_generator(
+    #     batch_size=batch_size, data_generator_args=copy.deepcopy(data_generator_args),
+    #     data_loader_params=copy.deepcopy(data_loader_params), data_loader_name=data_loader_name,
+    #     raw_samples=raw_samples, shuffle=shuffle, num_workers=num_workers
+    # )
 
     data_generator_args, data_loader_params = prepare_data_generator(
         batch_size=batch_size, data_generator_args=data_generator_args,
@@ -106,14 +114,17 @@ def load_in_memory_dataset(root, batch_size, data_generator_factory, slices=None
         from pystatplottools.pytorch_data_generation.pytorch_data_utils.datasets import InMemoryDataset
         dataset = InMemoryDataset(root=root, sample_data_generator_name=sample_data_generator_name,
                                   data_generator_factory=data_generator_factory)
+        if slices is not None:
+            dataset.data = dataset.data[slices[0]:slices[1]]
+            dataset.targets = dataset.targets[slices[0]:slices[1]]
+            dataset.n = slices[1] - slices[0]
     else:
         from pystatplottools.pytorch_data_generation.pytorch_geometric_utils.datasets import GeometricInMemoryDataset
         dataset = GeometricInMemoryDataset(root=root, sample_data_generator_name=sample_data_generator_name,
                                            data_generator_factory=data_generator_factory)
-
-    if slices is not None:
-        dataset = dataset[slices[0]:slices[1]]
-        dataset.n = slices[1] - slices[0]
+        if slices is not None:
+            dataset = dataset[slices[0]:slices[1]]
+            dataset.n = slices[1] - slices[0]
 
     from pystatplottools.pytorch_data_generation.pytorch_data_utils.dataloaders import data_loader_factory
     if dataset_type == "standard":
@@ -127,6 +138,46 @@ def load_in_memory_dataset(root, batch_size, data_generator_factory, slices=None
         'num_workers': num_workers
     }
     return data_loader_func(dataset, **data_loader_params)
+
+
+def load_from_pre_load_dataset(pre_load_dataset, root, batch_size, data_generator_factory, slices=None, shuffle=True, num_workers=0,
+                     rebuild=False, sample_data_generator_name=None, dataset_type="standard"):
+    assert os.path.isfile(root + "/raw/config.json"), "Cannot load data, data generation config file is not provided."
+
+    # Data loader is generated based on data in memory (or will be generated based on /raw/config.json for the first
+    # time and stored afterwards)
+
+    if rebuild and os.path.isdir(root + "/processed/"):
+        # Remove processed directory
+        shutil.rmtree(root + "/processed/")
+
+    # Load Dataset
+    if dataset_type == "standard":
+        assert False, "Not implemented!"
+        from pystatplottools.pytorch_data_generation.pytorch_data_utils.datasets import InMemoryDataset
+        dataset = InMemoryDataset(root=root, sample_data_generator_name=sample_data_generator_name,
+                                  data_generator_factory=data_generator_factory)
+    else:
+        from pystatplottools.pytorch_data_generation.pytorch_geometric_utils.datasets import GeometricInMemoryDataset
+        dataset = GeometricInMemoryDataset(root=root, sample_data_generator_name=sample_data_generator_name,
+                                           data_generator_factory=data_generator_factory, data=pre_load_dataset.data, slices=pre_load_dataset.slices)
+        if slices is not None:
+            dataset = dataset[slices[0]:slices[1]]
+            dataset.n = slices[1] - slices[0]
+
+    from pystatplottools.pytorch_data_generation.pytorch_data_utils.dataloaders import data_loader_factory
+    if dataset_type == "standard":
+        data_loader_func = data_loader_factory(data_loader_name="DataLoader")
+    else:
+        data_loader_func = data_loader_factory(data_loader_name="GeometricDataLoader")
+
+    data_loader_params = {
+        'batch_size': batch_size,  # -> Set since BatchDataLoader is not used
+        'shuffle': shuffle,
+        'num_workers': num_workers
+    }
+    return data_loader_func(dataset, **data_loader_params)
+
 
 
 ''' Helper functions '''

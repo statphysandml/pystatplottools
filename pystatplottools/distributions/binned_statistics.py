@@ -16,7 +16,8 @@ class BinnedStatistics(DistributionDD):
             range_min=None,  # Refers to the ranges of the bins in the different dimension of axes_indices
             range_max=None,  # Refers to the ranges of the bins in the different dimension of axes_indices
             bin_scales='linear',
-            with_binnumber=False
+            with_binnumber=False,
+            expand_binnumbers=False,
     ):
         """
         Computes binned statistics over binned samples in axes_indices for each data frame in self.data.
@@ -44,7 +45,8 @@ class BinnedStatistics(DistributionDD):
                                                 range_min=range_min,
                                                 range_max=range_max,
                                                 bin_scales=bin_scales,
-                                                with_binnumber=with_binnumber
+                                                with_binnumber=with_binnumber,
+                                                expand_binnumbers=expand_binnumbers
                                                 )
 
     def linearize(self, output_statistics_names=None, dataframes_as_columns=False, bin_alignment="center"):

@@ -14,7 +14,8 @@ class JointDistribution(DistributionDD):
             range_min=None,  # Refers to the ranges of the bins in the different dimension of axes_indices
             range_max=None,  # Refers to the ranges of the bins in the different dimension of axes_indices
             bin_scales='linear',
-            with_binnumber=False
+            with_binnumber=False,
+            expand_binnumbers=False
     ):
         """
         Computes a joint probability distribution/histogram of axes_indices over binned values of the data frame
@@ -34,7 +35,8 @@ class JointDistribution(DistributionDD):
 
         self._distribution = self._compute_binned_statistics(
             axes_indices=self._axes_indices, columns=None, statistic=statistic, transform="lin", nbins=nbins,
-            range_min=range_min, range_max=range_max, bin_scales=bin_scales, with_binnumber=with_binnumber)
+            range_min=range_min, range_max=range_max, bin_scales=bin_scales, with_binnumber=with_binnumber,
+            expand_binnumbers=expand_binnumbers)
 
     def linearize(self, output_statistics_name=None, dataframes_as_columns=False, bin_alignment="center"):
         """

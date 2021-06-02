@@ -76,6 +76,9 @@ class HelperIterBatchDataLoader:
             self.i += 1
             yield batch
 
+    def __iter__(self):
+        assert False, "__iter__ in HelperIterBatchDataloader of pystatplottools not implemented."
+
     def __next__(self):
         val = self._next()
         return next(val)

@@ -107,3 +107,4 @@ class Contour2D(DiagramBaseClass):
             else:
                 assert False, "The assignment of the tick labels to the ticks might be wrong. - Alternative: Add colorbar by yourself."
             cbar.ax.set_yticklabels(z_tick_labels)
+        return cbar

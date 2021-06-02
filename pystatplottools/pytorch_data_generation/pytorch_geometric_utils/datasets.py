@@ -7,13 +7,17 @@ from pystatplottools.pytorch_data_generation.pytorch_data_utils.datasets import 
 
 
 class GeometricInMemoryDataset(InMemoryDatasetBaseClass, geometric_data.InMemoryDataset):
-    def __init__(self, root, data_generator_factory, sample_data_generator_name=None, transform=None, pre_transform=None, pre_filter=None, plain=False):
+    def __init__(self, root, data_generator_factory, sample_data_generator_name=None, transform=None, pre_transform=None, pre_filter=None, plain=False, data=None, slices=None):
         super().initialize(data_generator_factory, root, transform, pre_transform, pre_filter)
         geometric_data.InMemoryDataset.__init__(self, root, transform, pre_transform, pre_filter)
 
         self.plain = plain
 
-        self.data, self.slices = torch.load(self.processed_paths[0])
+        if data is None and slices is None:
+            self.data, self.slices = torch.load(self.processed_paths[0])
+        else:
+            self.data = data
+            self.slices = slices
 
         self.n = len(self.data.y)
 

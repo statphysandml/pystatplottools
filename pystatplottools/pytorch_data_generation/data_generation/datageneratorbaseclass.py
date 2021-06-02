@@ -23,10 +23,10 @@ class DataGeneratorBaseClass(MHBC):
         random_seed = kwargs.get('seed', None)
         if random_seed is not None and set_seed is True:
             print("Random seed is set by seed", random_seed)
-            np.random.seed(random_seed)
+            self.rng = np.random.default_rng(random_seed)
         elif set_seed is True:
             print("Random seed is set by np.random.seed()")
-            np.random.seed()
+            self.rng = np.random.default_rng()
 
         self.inp_size = None
         self.tar_size = None

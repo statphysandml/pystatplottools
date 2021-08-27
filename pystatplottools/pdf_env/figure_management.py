@@ -121,7 +121,7 @@ def savefig(savedir_figures, path_to_out_file=None, type="pdf"):
         if not os.path.exists(path_to_out_dir):
             os.makedirs(path_to_out_dir)
         filename = os.path.join(savedir_figures, path_to_out_file)
-        plt.savefig('{}.pdf'.format(filename), bbox_inches=extent,  pad_inches=0.03)
+        plt.savefig('{}.pdf'.format(filename), bbox_inches=extent,  pad_inches=0.03, dpi=300)
         plt.close()
     elif path_to_out_file and type == "png":
         path_to_out_dir = os.path.dirname(os.path.join(savedir_figures, path_to_out_file))

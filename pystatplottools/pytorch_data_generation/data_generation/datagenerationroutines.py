@@ -6,187 +6,53 @@ import copy
 
 # Generate a data loader based on the given parameters with an OnTheFlyDataaset
 # (samples will be generated in real time and not stored permanently)
-def load_in_real_time_data_loader(
-        batch_size, data_generator_args, device=None, n=None, seed=0, set_seed=True,
-        data_generator_name=None, data_generator_factory=None, data_generator_func=None,
-        data_loader_params=None, data_loader_name="DataLoader", raw_samples=False, shuffle=True, num_workers=0):
+def load_in_real_time_dataset(
+        data_generator_args, batch_size=None, device=None, n=None, seed=0, set_seed=True,
+        data_generator_name=None, data_generator_factory=None, data_generator_func=None):
 
-    # ToDo: Adapt (copy.deepcopy)
-    # data_generator_args, data_loader_params = prepare_data_generator(
-    #     batch_size=batch_size, data_generator_args=copy.deepcopy(data_generator_args),
-    #     data_loader_params=copy.deepcopy(data_loader_params), data_loader_name=data_loader_name,
-    #     raw_samples=raw_samples, shuffle=shuffle, num_workers=num_workers
-    # )
+    data_generator_args_ = copy.deepcopy(data_generator_args)
 
-    data_generator_args, data_loader_params = prepare_data_generator(
-        batch_size=batch_size, data_generator_args=data_generator_args,
-        data_loader_params=data_loader_params, data_loader_name=data_loader_name,
-        raw_samples=raw_samples, shuffle=shuffle, num_workers=num_workers
-    )
+    # Remove batch_size in data_generator_args
+    if "batch_size" in data_generator_args_:
+        del data_generator_args_["batch_size"]
+        print("batch_size argument has been deleted in data_generator_args since this parameter is expected to be set"
+              "explicitly by the parameter batch_size when calling load_in_real_time_dataset.")
 
-    data_generator, n = generate_data_generator(
-        data_generator_args=data_generator_args, device=device, n=n, seed=seed, set_seed=set_seed,
+    # Verify correctness of the provided batch_size parameter and determine n (if n is None)
+    # [
+    if batch_size is not None:
+        # Data generator is expected to produce batches instead of single samples"
+        data_generator_args_["batch_size"] = batch_size
+
+    # Generate the data generator to determine n (if n is None)
+    datagenerator, n = generate_data_generator(
+        data_generator_args=data_generator_args_, device=device, n=n, seed=seed, set_seed=set_seed,
         data_generator_name=data_generator_name, data_generator_factory=data_generator_factory,
         data_generator_func=data_generator_func
     )
+
+    # Verify if the mock data generator produces batches, by checking for the existence of a respective attribute.
+    if batch_size is not None and not hasattr(datagenerator, "batch_size"):
+        assert False, "If batch_size is not None, the data generator is expected to produce batches instead of single" \
+                      "samples. Since the provided data generator has no attribute called batch_size, it is expected" \
+                      "that the data generator produces single samples. No batch_size parameter is expected."
+    # ]
 
     from pystatplottools.pytorch_data_generation.pytorch_data_utils.datasets import InRealTimeDataset
-    dataset = InRealTimeDataset(datagenerator=data_generator, n=n)
-
-    from pystatplottools.pytorch_data_generation.pytorch_data_utils.dataloaders import data_loader_factory
-    data_loader = data_loader_factory(data_loader_name=data_loader_name)
-
-    return data_loader(dataset, **data_loader_params)
+    dataset = InRealTimeDataset(datagenerator=datagenerator, n=n)
+    return dataset
 
 
-# Data generator args are or will be stored in the /raw/ directory
-# -> Data generation is prepared by storing a config.json file in the /raw/ directory
-def prepare_in_memory_dataset(
-        root, data_generator_args, batch_size=None, n=None, seed=None, set_seed=True,
-        data_generator_name=None, data_generator_factory=None, data_generator_func=None):
-    # Generate /raw/ directory for storage of the data_generator_args
-    if not os.path.isdir(root + "/raw/"):
-        os.makedirs(root + "/raw/")
-
-    data_generator_args, _ = prepare_data_generator(
-        batch_size=batch_size, data_generator_args=data_generator_args
-    )
-
-    if batch_size is not None:
-        data_generator_args["batch_size"] = batch_size
-
-    # To get n and to verify if data_generator can generate batches
-    # (skip_loading_data_in_init is an argument to skip loading the data in the data generator)
-    datagenerator, n = generate_data_generator(
-        data_generator_args={**data_generator_args, "skip_loading_data_in_init": True}, device="cpu", n=n, seed=seed, set_seed=set_seed,
-        data_generator_name=data_generator_name, data_generator_factory=data_generator_factory,
-        data_generator_func=data_generator_func
-    )
-
-    if batch_size is not None and not hasattr(datagenerator, "batch_size"):
-        assert False, "Data generator is expected to generate batches instead of single samples. " \
-                      "Setting a batch_size is not reasonable in this case. Consider to remove your argument for " \
-                      "batch size or define a datagenerator that has an attribute batch_size and generated batches " \
-                      "with batch size batch_size"
-
-    data_generator_args = {
-        "seed": seed,
-        "set_seed": set_seed,
-        "n": n,
-        **data_generator_args
-    }
-
-    new_config_data = {
-        "data_generator_name": data_generator_name,
-        "data_generator_args": data_generator_args,
-    }
-
-    # Check if given data_generator_args are the same as already stored - in this case the data is not generated again
-    skip_rebuilding = False
-    if os.path.isfile(root + "/raw/config.json"):
-        with open(root + "/raw/config.json") as json_file:
-            config_data = json.load(json_file)
-            if new_config_data == config_data:
-                skip_rebuilding = True
-
-    if os.path.isdir(root + "/processed/") and not skip_rebuilding:
-        print("Write new data_config into file - Data will be generated based on the new data_config file")
-        shutil.rmtree(root + "/processed/")
-
-    with open(root + "/raw/" + 'config.json', 'w') as outfile:
-        json.dump(new_config_data, outfile, indent=4)
-
-
-# Generic data loader class
-def load_in_memory_dataset(root, batch_size, data_generator_factory, slices=None, shuffle=True, num_workers=0,
-                     rebuild=False, sample_data_generator_name=None, dataset_type="standard"):
-    assert os.path.isfile(root + "/raw/config.json"), "Cannot load data, data generation config file is not provided."
-
-    # Data loader is generated based on data in memory (or will be generated based on /raw/config.json for the first
-    # time and stored afterwards)
-
-    if rebuild and os.path.isdir(root + "/processed/"):
-        # Remove processed directory
-        shutil.rmtree(root + "/processed/")
-
-    # Load Dataset
-    if dataset_type == "standard":
-        from pystatplottools.pytorch_data_generation.pytorch_data_utils.datasets import InMemoryDataset
-        dataset = InMemoryDataset(root=root, sample_data_generator_name=sample_data_generator_name,
-                                  data_generator_factory=data_generator_factory)
-        if slices is not None:
-            dataset.data = dataset.data[slices[0]:slices[1]]
-            dataset.targets = dataset.targets[slices[0]:slices[1]]
-            dataset.n = slices[1] - slices[0]
-    else:
-        from pystatplottools.pytorch_data_generation.pytorch_geometric_utils.datasets import GeometricInMemoryDataset
-        dataset = GeometricInMemoryDataset(root=root, sample_data_generator_name=sample_data_generator_name,
-                                           data_generator_factory=data_generator_factory)
-        if slices is not None:
-            dataset = dataset[slices[0]:slices[1]]
-            dataset.n = slices[1] - slices[0]
-
-    from pystatplottools.pytorch_data_generation.pytorch_data_utils.dataloaders import data_loader_factory
-    if dataset_type == "standard":
-        data_loader_func = data_loader_factory(data_loader_name="DataLoader")
-    else:
-        data_loader_func = data_loader_factory(data_loader_name="GeometricDataLoader")
-
-    data_loader_params = {
-        'batch_size': batch_size,  # -> Set since BatchDataLoader is not used
-        'shuffle': shuffle,
-        'num_workers': num_workers
-    }
-    return data_loader_func(dataset, **data_loader_params)
-
-
-def load_from_pre_load_dataset(pre_load_dataset, root, batch_size, data_generator_factory, slices=None, shuffle=True, num_workers=0,
-                     rebuild=False, sample_data_generator_name=None, dataset_type="standard"):
-    assert os.path.isfile(root + "/raw/config.json"), "Cannot load data, data generation config file is not provided."
-
-    # Data loader is generated based on data in memory (or will be generated based on /raw/config.json for the first
-    # time and stored afterwards)
-
-    if rebuild and os.path.isdir(root + "/processed/"):
-        # Remove processed directory
-        shutil.rmtree(root + "/processed/")
-
-    # Load Dataset
-    if dataset_type == "standard":
-        assert False, "Not implemented!"
-        from pystatplottools.pytorch_data_generation.pytorch_data_utils.datasets import InMemoryDataset
-        dataset = InMemoryDataset(root=root, sample_data_generator_name=sample_data_generator_name,
-                                  data_generator_factory=data_generator_factory)
-    else:
-        from pystatplottools.pytorch_data_generation.pytorch_geometric_utils.datasets import GeometricInMemoryDataset
-        dataset = GeometricInMemoryDataset(root=root, sample_data_generator_name=sample_data_generator_name,
-                                           data_generator_factory=data_generator_factory, data=pre_load_dataset.data, slices=pre_load_dataset.slices)
-        if slices is not None:
-            dataset = dataset[slices[0]:slices[1]]
-            dataset.n = slices[1] - slices[0]
-
-    from pystatplottools.pytorch_data_generation.pytorch_data_utils.dataloaders import data_loader_factory
-    if dataset_type == "standard":
-        data_loader_func = data_loader_factory(data_loader_name="DataLoader")
-    else:
-        data_loader_func = data_loader_factory(data_loader_name="GeometricDataLoader")
-
-    data_loader_params = {
-        'batch_size': batch_size,  # -> Set since BatchDataLoader is not used
-        'shuffle': shuffle,
-        'num_workers': num_workers
-    }
-    return data_loader_func(dataset, **data_loader_params)
-
-
-
-''' Helper functions '''
-
-
-def prepare_data_generator(
-        batch_size, data_generator_args, data_loader_params=None, data_loader_name="DataLoader",
-        raw_samples=False, shuffle=True, num_workers=0):
-
+"""
+Generates a data loader (DataLoader or GeometricDataLoader) based on the given dataset
+:param batch_size: Batch size
+:param shuffle: Todo...
+:param slices: Tuple for loading only slice of the dataset in the data loader. Useful for a separate definition of a
+training, validation and test set. 
+:param num_workers: Todo...
+"""
+def load_in_real_time_data_loader(dataset, batch_size=None, data_loader_name="DataLoader", data_loader_params=None,
+                                  raw_samples=False, shuffle=True, num_workers=0):
     # Data loader params
     if data_loader_params is None:
         data_loader_params = {
@@ -195,27 +61,199 @@ def prepare_data_generator(
             'num_workers': num_workers
         }
     else:
-        assert raw_samples is False and shuffle and num_workers == 0,\
+        assert raw_samples is False and shuffle and num_workers == 0, \
             "When data_loader_params are defined, raw_samples, shuffle and num_workers are not taken into account."
 
-    # Remove batch_size in data_loader params
-    if "batch_size" in data_generator_args:
-        del data_generator_args["batch_size"]
-        print(
-            "Batch_size argument has been deleted in data_generator_args since this parameter needs to be passed separately for this function")
-    if "batch_size" in data_loader_params:
-        del data_loader_params["batch_size"]
-        print(
-            "Batch_size argument has been deleted in data_loader_params since this parameter needs to be passed separately for this function")
-
     if data_loader_name == "BatchDataLoader":
-        data_generator_args["batch_size"] = batch_size
+        print("Note that the batch_size parameter has no effect on the BatchDataLoader. The batch_size is instead "
+              "determined by the batch_size of the real time dataset.")
     else:
+        # DataLoader or GeometricDataLoader
+        # -> Batches are generated by single samples from the data generator
+        # Add batch_size as an additional parameter to data_loader_params
         data_loader_params["batch_size"] = batch_size
 
-    return data_generator_args, data_loader_params
+    from pystatplottools.pytorch_data_generation.pytorch_data_utils.dataloaders import data_loader_factory
+    data_loader_func = data_loader_factory(data_loader_name=data_loader_name)
+
+    return data_loader_func(dataset, **data_loader_params)
 
 
+"""
+Prepares an in memory dataset by storing a config.json file in the /raw/ directory containing all important parameters
+for a successful data generation. The utilized data generator
+can be assigned either by defining data_generator_name and data_generator_factory OR by providing a data_generator_func.
+In dependence on the data generator, the function returns an object of the data generator as well as the number n of
+samples to be generated or the maximum number of available samples
+:param root: Root directory for the dataset where the config file will be generated in root/raw/ and the .pt files
+in root/processed/
+:param data_generator_args: Arguments which will be passed to the utilized data generator
+:param batch_size: None if data generator produces single samples, batch size if the data generator produces entire
+batches instead of single samples.
+:param n: Total number of samples to be generated. If n is None, it is determined by len(data_generator).
+...ToDo...
+"""
+def prepare_in_memory_dataset(
+    root, data_generator_args, batch_size=None, n=None, seed=None, set_seed=True,
+    data_generator_name=None, data_generator_factory=None, data_generator_func=None):
+
+    data_generator_args_ = copy.deepcopy(data_generator_args)
+
+    # Generate /raw/ directory for storage of the data_generator_args
+    if not os.path.isdir(root + "/raw/"):
+        os.makedirs(root + "/raw/")
+
+    # Remove batch_size in data_data_generator_args
+    if "batch_size" in data_generator_args_:
+        del data_generator_args_["batch_size"]
+        print("batch_size argument has been deleted in data_generator_args since this parameter is expected to be set"
+              "explicitly by the parameter batch_size when calling prepare_in_memory_dataset.")
+
+    # Verify correctness of the provided batch_size parameter and determine n (if n is None)
+    # [
+    if batch_size is not None:
+        # Data generator is expected to produce batches instead of single samples"
+        data_generator_args_["batch_size"] = batch_size
+
+    # Generate a mock data generator to determine n (if n is None)
+    # (skip_loading_data_in_init is an argument to skip loading the data in the data generator)
+    datagenerator, n = generate_data_generator(
+        data_generator_args={**data_generator_args_, "skip_loading_data_in_init": True}, device="cpu", n=n, seed=seed, set_seed=set_seed,
+        data_generator_name=data_generator_name, data_generator_factory=data_generator_factory,
+        data_generator_func=data_generator_func
+    )
+
+    # Verify if the mock data generator produces batches, by checking for the existence of a respective attribute.
+    if batch_size is not None and not hasattr(datagenerator, "batch_size"):
+        assert False, "If batch_size is not None, the data generator is expected to produce batches instead of single" \
+                      "samples. Since the provided data generator has no attribute called batch_size, it is expected" \
+                      "that the data generator produces single samples. No batch_size parameter is expected."
+    # ]
+
+    # Finalize config data
+    data_generator_args_ = {
+        "seed": seed,
+        "set_seed": set_seed,
+        "n": n,
+        **data_generator_args_
+    }
+
+    new_config_data = {
+        "data_generator_name": data_generator_name,
+        "data_generator_args": data_generator_args_,
+    }
+
+    # Check if given config data are the same as already stored
+    skip_rebuilding = False
+    if os.path.isfile(root + "/raw/config.json"):
+        with open(root + "/raw/config.json") as json_file:
+            config_data = json.load(json_file)
+            if new_config_data == config_data:
+                skip_rebuilding = True
+
+    # Remove root + /processed/ directory, including existing .pt files, since configurations have been changed.
+    # This leads to generation of the data based on the update config data when load_in_memory_dataset is called the
+    # next time
+    if os.path.isdir(root + "/processed/") and not skip_rebuilding:
+        print("Write new data_config into file - Data will be generated based on the new data_config file")
+        shutil.rmtree(root + "/processed/")
+
+    # Store new config data in file
+    with open(root + "/raw/" + 'config.json', 'w') as outfile:
+        json.dump(new_config_data, outfile, indent=4)
+
+
+"""
+Generates an im memory dataset generated based on the config.json file in
+root/raw/. If the data has been generated already, the dataset will be loaded from root/processed/. 
+:param root: Root directory for the dataset where the config file is expected to be in root/raw/ and the .pt files
+in root/processed/
+:param data_generator_factory: Data generator factory providing the correct data generator for producing the dataset.
+:param rebuild: If set to True, the data will generated again.
+:param sample_data_generator_name: (Optional) If set to None, the same data generator as the one used for generating
+the data set will be used for further sampling. Otherwise, this sample_data_generatore_name is used to define a new
+data generator. This feature can be useful for testing and evaluating purposes (provide an example!).
+:param dataset_type: ("standard" or "geometric") Provide information about the type of data to be generated.
+"""
+def load_in_memory_dataset(root, data_generator_factory,
+                           rebuild=False, sample_data_generator_name=None, dataset_type="standard"):
+    assert os.path.isfile(root + "/raw/config.json"), "Cannot load data, data generation config file is not provided."
+
+    if rebuild and os.path.isdir(root + "/processed/"):
+        # Remove processed directory
+        shutil.rmtree(root + "/processed/")
+
+    # Load Dataset
+    if dataset_type == "standard":
+        from pystatplottools.pytorch_data_generation.pytorch_data_utils.datasets import InMemoryDataset
+        dataset = InMemoryDataset(root=root, sample_data_generator_name=sample_data_generator_name,
+                                  data_generator_factory=data_generator_factory)
+    else:
+        from pystatplottools.pytorch_data_generation.pytorch_geometric_utils.datasets import GeometricInMemoryDataset
+        dataset = GeometricInMemoryDataset(root=root, sample_data_generator_name=sample_data_generator_name,
+                                           data_generator_factory=data_generator_factory)
+    return dataset
+
+
+"""
+Generates a data loader (DataLoader or GeometricDataLoader) based on the given dataset
+:param batch_size: Batch size
+:param shuffle: Todo...
+:param slices: Tuple for loading only slice of the dataset in the data loader. Useful for a separate definition of a
+training, validation and test set. 
+:param num_workers: Todo...Also: Meaning of raw_samples?????
+"""
+def load_in_memory_data_loader(dataset, batch_size, data_loader_params=None, shuffle=True, slices=None, num_workers=0):
+    from pystatplottools.pytorch_data_generation.pytorch_data_utils.dataloaders import data_loader_factory
+    data_loader_dataset = dataset
+    if type(dataset).__name__ == 'InMemoryDataset':
+        if slices is not None:
+            import copy
+            data_loader_dataset = copy.copy(dataset)
+            data_loader_dataset.data = data_loader_dataset.data[slices[0]:slices[1]]
+            data_loader_dataset.targets = data_loader_dataset.targets[slices[0]:slices[1]]
+            data_loader_dataset.n = slices[1] - slices[0]
+        data_loader_func = data_loader_factory(data_loader_name="DataLoader")
+    else:
+        if slices is not None:
+            import copy
+            data_loader_dataset = copy.copy(dataset)
+            data_loader_dataset = data_loader_dataset[slices[0]:slices[1]]
+            data_loader_dataset.n = slices[1] - slices[0]
+        data_loader_func = data_loader_factory(data_loader_name="GeometricDataLoader")
+
+    if data_loader_params is None:
+        data_loader_params = {
+            'shuffle': shuffle,
+            'num_workers': num_workers
+        }
+    elif hasattr(data_loader_params, "batch_size"):
+        print("Overwriting data_loader_params batch_size by provided batch_size", batch_size)
+    data_loader_params["batch_size"] = batch_size  # -> Set since BatchDataLoader is NOT used
+
+    return data_loader_func(data_loader_dataset, **data_loader_params)
+
+
+''' Helper functions '''
+
+"""
+Generates with data_generator_args, seed, set_seed and device as arguments a data generator. The utilized data generator
+can be assigned either by defining data_generator_name and data_generator_factory OR by providing a data_generator_func.
+In dependence on the data generator, the function returns an object of the data generator as well as the number n of
+samples to be generated or the maximum number of available samples
+
+:param data_generator_args: Arguments passed to the data_generator.
+:param device: Argument passed to the data_generator.
+:param device: Argument passed to the data_generator.
+:param n: Can be used to only load a limited number of data n < total number of data. This applies only if the number of
+available data is finite. If n is None, len(datagenerator) will be assigned to n.
+:param seed: Random seed passed to the data_generator.
+:param set_seed: Boolean as argument passed to the data_generator.
+:param data_generator_name: Name passed to the data_generator_factory.
+:param data_generator_factors: Factory method used to return the desired data generator.
+:param data_generator_func: Name of the utilized data generator.
+:return: The generated data generator and n.
+"""
 def generate_data_generator(data_generator_args, device=None, n=None, seed=0, set_seed=True,
                             data_generator_name=None, data_generator_factory=None, data_generator_func=None):
 

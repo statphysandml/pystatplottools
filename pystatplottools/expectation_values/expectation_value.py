@@ -54,7 +54,24 @@ class ExpectationValue:
     def expectation_values(self):
         return self.computed_expectation_values
 
-    def compute_error_with_bootstrap(self, n_means_boostrap, number_of_measurements, columns, exp_values, running_parameter="default",
+    def jackknife_error(self, number_of_measurements, columns, exp_values, running_parameter="default",
+                                     transform="lin"):
+        import copy
+        ep_std = ExpectationValue(data=self.data)
+        ep_std.compute_expectation_value(columns=columns, exp_values=['mean'])
+        ep_mean = copy.deepcopy(ep_std.expectation_values)
+        data_mask = np.ones(len(self.data), dtype=np.bool)
+        data_mask[0::number_of_measurements] = False
+        estimated_error = np.zeros_like(ep_mean.values)
+        for leave_out_index in range(1, number_of_measurements):
+            ep_std.data = self.data.loc[data_mask, columns]
+            ep_std.compute_expectation_value(columns=columns, exp_values=['mean'])
+            estimated_error += np.power(ep_std.expectation_values.values - ep_mean.values, 2)
+            data_mask[leave_out_index - 1::number_of_measurements] = True
+            data_mask[leave_out_index::number_of_measurements] = False
+        self.errors = pd.DataFrame(data=np.sqrt(estimated_error), index=ep_mean.index, columns=ep_mean.columns)
+
+    def bootstrap_error(self, n_means_boostrap, number_of_measurements, columns, exp_values, running_parameter="default",
                                      transform="lin"):
         split_data = [pd.concat([tup[1], tup[1]]).reset_index(drop=True) for tup in list(self.data.groupby(running_parameter))]
 
@@ -69,10 +86,10 @@ class ExpectationValue:
 
         self.errors = pd.concat(means).groupby(running_parameter).apply(lambda x: std(x))
 
-    def compute_std_error(self, columns):
+    def statistical_error(self, number_of_measurements, columns):
         ep_std = ExpectationValue(data=self.data)
         ep_std.compute_expectation_value(columns=columns, exp_values=['std'])
-        self.errors = ep_std.expectation_values
+        self.errors = ep_std.expectation_values / np.sqrt(number_of_measurements)
 
     @staticmethod
     def __evaluate_expectation_values(data, computed_expectation_values, columns,
@@ -93,14 +110,13 @@ class ExpectationValue:
 
         # Compute or extend expectation values
         if computed_expectation_values is None:
-            computed_expectation_values = data[columns].groupby(level=0, axis=0).agg(exp_values)
+            computed_expectation_values = data[columns].groupby(level=0, axis=0).agg(exp_values).sort_index(axis=1)
         else:
             new_computed_expectation_values = data[columns].groupby(level=0, axis=0).agg(exp_values)
             # Extract duplicate columns
             cols_to_use = computed_expectation_values.columns.difference(new_computed_expectation_values.columns)
             computed_expectation_values = pd.concat([computed_expectation_values[cols_to_use], new_computed_expectation_values],
-                                                axis=1,
-                                                verify_integrity=True).sort_index(axis=1)
+                                                    axis=1, verify_integrity=True).sort_index(axis=1)
 
         return computed_expectation_values
 

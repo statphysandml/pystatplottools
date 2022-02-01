@@ -115,7 +115,7 @@ def newfiggrid(width, **kwargs):
 
 def savefig(savedir_figures, path_to_out_file=None, type="pdf"):
     extent = "tight"
-    print(path_to_out_file)
+    # print(path_to_out_file)
     if path_to_out_file and type == "pdf":
         path_to_out_dir = os.path.dirname(os.path.join(savedir_figures, path_to_out_file))
         if not os.path.exists(path_to_out_dir):

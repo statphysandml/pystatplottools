@@ -36,15 +36,17 @@ pgf_with_latex = {  # setup matplotlib to use latex for output
     "xtick.labelsize": 7,# changed from 8
     "ytick.labelsize": 7, # changed from 8
     "figure.figsize": figsize(1),  # default fig size of 0.9 textwidth
-    "pgf.preamble": [
-        r"\usepackage[utf8x]{inputenc}",  # use utf8 fonts becasue your computer can handle it :)
-        r"\usepackage[T1]{fontenc}",  # plots will be generated using this preamble
-        r"\usepackage{amsmath}",
-        r"\usepackage{amssymb}",
-        r"\usepackage{mathrsfs}",
-        r"\usepackage{esint} %for additional integral symbols",
-        r"\usepackage{bbm} % Number fields symbols"
-    ]
+    "pgf.rcfonts": False,
+    "axes.unicode_minus": False,
+    # "pgf.preamble": [ # Leads to an error which I haven't figured out yet...
+    #     r"\usepackage[utf8x]{inputenc}",  # use utf8 fonts becasue your computer can handle it :)
+    #     r"\usepackage[T1]{fontenc}",  # plots will be generated using this preamble
+    #     r"\usepackage{amsmath}",
+    #     r"\usepackage{amssymb}",
+    #     r"\usepackage{mathrsfs}",
+    #     r"\usepackage{esint} %for additional integral symbols",
+    #     r"\usepackage{bbm} % Number fields symbols"
+    # ]
 }
 
 pgf_with_latex_scaled = {  # setup matplotlib to use latex for output
@@ -60,15 +62,17 @@ pgf_with_latex_scaled = {  # setup matplotlib to use latex for output
     "xtick.labelsize": 7,# changed from 8
     "ytick.labelsize": 7, # changed from 8
     "figure.figsize": figsize(1),  # default fig size of 0.9 textwidth
-    "pgf.preamble": [
-        r"\usepackage[utf8x]{inputenc}",  # use utf8 fonts becasue your computer can handle it :)
-        r"\usepackage[T1]{fontenc}",  # plots will be generated using this preamble
-        r"\usepackage{amsmath}",
-        r"\usepackage{amssymb}",
-        r"\usepackage{mathrsfs}",
-        r"\usepackage{esint} %for additional integral symbols",
-        r"\usepackage{bbm} % Number fields symbols"
-    ]
+    "pgf.rcfonts": False,
+    "axes.unicode_minus": False,
+    # "pgf.preamble": [ # Leads to an error which I haven't figured out yet...
+    #     r"\usepackage[utf8x]{inputenc}",  # use utf8 fonts becasue your computer can handle it :)
+    #     r"\usepackage[T1]{fontenc}",  # plots will be generated using this preamble
+    #     r"\usepackage{amsmath}",
+    #     r"\usepackage{amssymb}",
+    #     r"\usepackage{mathrsfs}",
+    #     r"\usepackage{esint} %for additional integral symbols",
+    #     r"\usepackage{bbm} % Number fields symbols"
+    # ]
 }
 
 mpl.rcParams.update(pgf_with_latex)

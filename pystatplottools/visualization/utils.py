@@ -9,10 +9,10 @@ def figure_decorator(func):
 
         fma = kwargs.pop("fma", None)
 
-        figsize = kwargs.pop("figsize", (10, 7))
-        width = kwargs.pop("width", 1.0)
-        type = kwargs.pop("type", "png")
-        ratio = kwargs.pop("ratio", None)
+        figsize = kwargs.get("figsize", (10, 7))
+        width = kwargs.get("width", 1.0)
+        type = kwargs.get("type", "png")
+        ratio = kwargs.get("ratio", None)
         dim = kwargs.get("dim", None)
 
         import matplotlib.pyplot as plt

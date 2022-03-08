@@ -148,7 +148,7 @@ def prepare_in_memory_dataset(
     if os.path.isfile(root + "/raw/config.json"):
         with open(root + "/raw/config.json") as json_file:
             config_data = json.load(json_file)
-            if new_config_data == config_data:
+            if json.dumps(new_config_data, sort_keys=True) == json.dumps(config_data, sort_keys=True):
                 skip_rebuilding = True
 
     # Remove root + /processed/ directory, including existing .pt files, since configurations have been changed.

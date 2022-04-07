@@ -18,8 +18,7 @@ def load_multivariate_mock_data():
 
 def load_characteristics():
     from examples.pytorch_in_memory_dataset import load_rectangle_data_memory_dataset
-    data_loader = load_rectangle_data_memory_dataset()
-    dataset = data_loader.get_dataset_inspector()
+    dataset = load_rectangle_data_memory_dataset()
     data, targets = dataset.data.cpu().numpy(), dataset.targets.cpu().numpy()
 
     import numpy as np

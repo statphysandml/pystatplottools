@@ -1,15 +1,14 @@
+from pystatplottools.pdf_env.loading_figure_mode import loading_figure_mode
+fma, plt = loading_figure_mode(develop=False)
+plt.style.use('seaborn-dark-palette')
 
 
 if __name__ == '__main__':
-    from pystatplottools.pdf_env.loading_figure_mode import loading_figure_mode
-    fma, plt = loading_figure_mode(develop=True)
-    plt.style.use('seaborn-dark-palette')
-
     # Load data loader
     from examples.pytorch_in_memory_dataset import prepare_rectangle_data_in_memory_dataset,\
         load_rectangle_data_memory_dataset
     prepare_rectangle_data_in_memory_dataset()
-    data_loader = load_rectangle_data_memory_dataset()
+    dataset = load_rectangle_data_memory_dataset()
 
     directory = "./results/RectangleData"
 
@@ -20,14 +19,10 @@ if __name__ == '__main__':
     config_dim = (10, 12)
 
     # Random sample
-    config, label = data_loader.dataset.get_random_sample()
-
-    # Alternative
-    # dataset_inspector = data_loader.get_dataset_inspector()
-    # config, label = dataset_inspector.sampler()
+    config, label = dataset.get_random_sample()
 
     # Random batch with size 108
-    batch, batch_label = data_loader.dataset.get_random_batch(108)
+    batch, batch_label = dataset.get_random_batch(108)
 
     # Single Sample
     sample_visualization.fd_im_single_sample(sample=config, label=label, config_dim=config_dim, minmax=(0, 1),

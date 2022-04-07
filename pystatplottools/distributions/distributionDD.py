@@ -391,7 +391,7 @@ class DistributionDD:
     def _tile_scalar(val, row_values, axes_indices, identifier='nbins'):
         n = len(axes_indices)
         if hasattr(val, "__len__") and type(val) != str:
-            assert len(val) == n, "Number of " + identifier + " and dimension " + str(n) + "do not coincide."
+            assert len(val) == n, "Number of " + identifier + " and dimension " + str(n) + " do not coincide."
             scalars = val
         else:
             scalars = [val for _ in range(n)]

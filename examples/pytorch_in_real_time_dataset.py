@@ -22,12 +22,13 @@ if __name__ == '__main__':
     from pystatplottools.pytorch_data_generation.pytorch_data_utils.datasets import InRealTimeDataset
     dataset = InRealTimeDataset(datagenerator=data_generator, n=10000)
 
-    from pystatplottools.pytorch_data_generation.pytorch_data_utils.dataloaders import DataLoader
+    from torch.utils import data
     data_loader_params = {
         'batch_size': 512,
-        'shuffle': True,  # Where used in dataset -> not at all, but by the Dataloader??
-        'num_workers': 0}
-    data_loader = DataLoader(dataset=dataset, **data_loader_params)
+        'shuffle': True,
+        'num_workers': 0
+    }
+    data_loader = data.DataLoader(dataset=dataset, **data_loader_params)
 
     import time
     t = time.time()
@@ -56,18 +57,22 @@ if __name__ == '__main__':
         'shuffle': True,  # Used correctly by the Dataloader??
         'num_workers': 0}
 
-    from pystatplottools.pytorch_data_generation.data_generation.datagenerationroutines import load_in_real_time_data_loader
-
-    data_loader = load_in_real_time_data_loader(
-        batch_size=512,
+    from pystatplottools.pytorch_data_generation.data_generation.datagenerationroutines import load_in_real_time_dataset
+    dataset = load_in_real_time_dataset(
         data_generator_args=data_generator_args,
+        batch_size=512,
         data_generator_name="BatchRectangleGenerator",
         data_generator_factory=data_generator_factory,
-        data_loader_params=data_loader_params,
-        data_loader_name="BatchDataLoader",
         seed=None,
         set_seed=True,
         n=10000
+    )
+
+    from pystatplottools.pytorch_data_generation.data_generation.datagenerationroutines import load_in_real_time_data_loader
+    data_loader = load_in_real_time_data_loader(
+        dataset=dataset,
+        data_loader_params=data_loader_params,
+        data_loader_name="BatchDataLoader"
     )
 
     t = time.time()

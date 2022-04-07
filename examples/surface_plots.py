@@ -1,5 +1,5 @@
 from pystatplottools.pdf_env.loading_figure_mode import loading_figure_mode
-fma, plt = loading_figure_mode(develop=True)
+fma, plt = loading_figure_mode(develop=False)
 
 
 def joint_distribution_surface_plot():
@@ -29,7 +29,7 @@ def joint_distribution_surface_plot():
     )
     contour2D.add_colorbar(fig=fig, cf=cf, z_label="Probability")
     plt.tight_layout()
-    fma.savefig("./", "probability_surface")
+    fma.savefig("./results/", "probability_surface")
 
 
 if __name__ == '__main__':

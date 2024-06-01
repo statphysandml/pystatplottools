@@ -27,7 +27,7 @@ python setup.py sdist
 pip install -e .
 ```
 
-For virtual enviroments, the library needs to be activate beforehand.
+For virtual environments, the library needs to be activate beforehand.
 
 After this step, the different modules of the library can be used, for example, by
 
